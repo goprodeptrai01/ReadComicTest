@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadMangaTest", "ReadMangaTest\ReadMangaTest.csproj", "{015E82C3-6764-4193-97C9-423543CEBD86}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{015E82C3-6764-4193-97C9-423543CEBD86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{015E82C3-6764-4193-97C9-423543CEBD86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{015E82C3-6764-4193-97C9-423543CEBD86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{015E82C3-6764-4193-97C9-423543CEBD86}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
