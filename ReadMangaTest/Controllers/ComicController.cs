@@ -70,7 +70,7 @@ public class ComicController: ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(200, Type = typeof(Comic))]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> DeleteTruyen(int id)
+    public async Task<IActionResult> DeleteComic(int id)
     {
         var comic = await _repository.GetByIdAsync(id);
         if (comic == null)
