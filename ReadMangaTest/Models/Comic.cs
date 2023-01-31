@@ -18,5 +18,6 @@ public class Comic
     public Artist Artist { get; set; }
     public virtual ICollection<Chapter> Chapters { get; set; }
     
-    public ICollection<ComicCategory> comicCategories { get; set; }
+    public ICollection
+        <ComicCategory> comicCategories { get; set; }
 }

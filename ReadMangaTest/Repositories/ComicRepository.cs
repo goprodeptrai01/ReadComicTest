@@ -25,6 +25,11 @@ public class ComicRepository: IComicRepository
         return await _context.Comics.FindAsync(id);
     }
 
+    public async Task<IEnumerable<Comic>> GetByArtistIdAsync(int artistId)
+    {
+        return await _context.Comics.Where(x => x.Artist.Id == artistId).ToListAsync(); 
+    }
+
     public async Task AddAsync(Comic comic)
     {
         

@@ -54,6 +54,27 @@ public class ComicController : ControllerBase
 
     }
 
+    [HttpGet("artist/{artistId}")]
+    [ProducesResponseType(200, Type = typeof(IEnumerable<Comic>))]
+    public async Task<IActionResult> GetComicsByArtist(int artistId)
+    {
+        try
+        {
+            var comics = await _comicRepository.GetByArtistIdAsync(artistId);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return Ok(comics);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal Server Error " + e.Message);
+        }
+    }
+    
+
     [HttpGet("{id}")]
     [ProducesResponseType(200, Type = typeof(Comic))]
     [ProducesResponseType(400)]
@@ -104,75 +125,75 @@ public class ComicController : ControllerBase
         }
     }
 
-    [HttpPost("{comicId}/Category")]
-    [ProducesResponseType(201, Type = typeof(Comic))]
-    [ProducesResponseType(400)]
-    public async Task<IActionResult> AddCategoryToComic([FromRoute] int comicId, [FromBody] CategoryDto categoryDto)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        // var category = _mapper.Map<Category>(categoryDto);
-        try
-        {
-            var category = _mapper.Map<Category>(categoryDto);
-            var comic = await _context.Comics.FindAsync(comicId);
-            if (comic == null)
-            {
-                return NotFound();
-            }
-
-            var comicCategory = new ComicCategory()
-            {
-                ComicId = comicId,
-                Comic = comic,
-                CategoryId = category.Id,
-                Category = category
-            };
-            comic.comicCategories.Add(comicCategory);
-            category.comicCategories.Add(comicCategory);
-            await _context.SaveChangesAsync();
-
-            return Ok();
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, "Internal Server Error" + e.Message);
-        }
-    }
-
-    [HttpPost("{comicId}/Artist")]
-    [ProducesResponseType(201, Type = typeof(Comic))]
-    [ProducesResponseType(400)]
-    public async Task<IActionResult> AddArtistToComic([FromRoute] int comicId, [FromBody] ArtistDto artistDto)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        try
-        {
-            var artist = _mapper.Map<Artist>(artistDto);
-            var comic = await _context.Comics.FindAsync(comicId);
-            if (comic == null)
-            {
-                return NotFound();
-            }
-
-            comic.Artist = artist;
-            // await _context.SaveChangesAsync();
-            artist.Comics.Add(comic);
-            await _context.SaveChangesAsync();
-            return Ok();
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, "Internal Server Error" + e.Message);
-        }
-    }
+    // [HttpPost("{comicId}/Category")]
+    // [ProducesResponseType(201, Type = typeof(Comic))]
+    // [ProducesResponseType(400)]
+    // public async Task<IActionResult> AddCategoryToComic([FromRoute] int comicId, [FromBody] CategoryDto categoryDto)
+    // {
+    //     if (!ModelState.IsValid)
+    //     {
+    //         return BadRequest(ModelState);
+    //     }
+    //
+    //     // var category = _mapper.Map<Category>(categoryDto);
+    //     try
+    //     {
+    //         var category = _mapper.Map<Category>(categoryDto);
+    //         var comic = await _context.Comics.FindAsync(comicId);
+    //         if (comic == null)
+    //         {
+    //             return NotFound();
+    //         }
+    //
+    //         var comicCategory = new ComicCategory()
+    //         {
+    //             ComicId = comicId,
+    //             Comic = comic,
+    //             CategoryId = category.Id,
+    //             Category = category
+    //         };
+    //         comic.comicCategories.Add(comicCategory);
+    //         category.comicCategories.Add(comicCategory);
+    //         await _context.SaveChangesAsync();
+    //
+    //         return Ok();
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         return StatusCode(500, "Internal Server Error" + e.Message);
+    //     }
+    // }
+    //
+    // [HttpPost("{comicId}/Artist")]
+    // [ProducesResponseType(201, Type = typeof(Comic))]
+    // [ProducesResponseType(400)]
+    // public async Task<IActionResult> AddArtistToComic([FromRoute] int comicId, [FromBody] ArtistDto artistDto)
+    // {
+    //     if (!ModelState.IsValid)
+    //     {
+    //         return BadRequest(ModelState);
+    //     }
+    //
+    //     try
+    //     {
+    //         var artist = _mapper.Map<Artist>(artistDto);
+    //         var comic = await _context.Comics.FindAsync(comicId);
+    //         if (comic == null)
+    //         {
+    //             return NotFound();
+    //         }
+    //
+    //         comic.Artist = artist;
+    //         // await _context.SaveChangesAsync();
+    //         artist.Comics.Add(comic);
+    //         await _context.SaveChangesAsync();
+    //         return Ok();
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         return StatusCode(500, "Internal Server Error" + e.Message);
+    //     }
+    // }
 
     [HttpPut("{comicId}")]
     [ProducesResponseType(200, Type = typeof(Comic))]
@@ -186,9 +207,14 @@ public class ComicController : ControllerBase
 
         try
         {
-            var comic = _mapper.Map<Comic>(comicDto);
+            var comic = await _comicRepository.GetByIdAsync(comicId);
+            if (comic == null)
+            {
+                return NotFound();
+            }
+            _mapper.Map(comicDto, comic);
             await _comicRepository.UpdateAsync(comic);
-            return NoContent();
+            return Ok(comic);
         }
         catch (Exception e)
         {
