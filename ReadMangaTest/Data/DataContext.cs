@@ -13,34 +13,19 @@ public class DataContext: DbContext
     public DbSet<Chapter> Chapters { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Artist> Artists { get; set; }
-    public DbSet<GroupTranslation> GroupTranslations { get; set; }
+    public DbSet<ComicCategory> ComicCategories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<GroupTranslationComic>()
-            .HasKey(gtc => new { gtc.GroupTranslationId, gtc.ComicId });
-        modelBuilder.Entity<GroupTranslationComic>()
-            .HasOne(gtc => gtc.GroupTranslation)
-            .WithMany(gt => gt.GroupTranslationComics)
-            .HasForeignKey(gtc => gtc.GroupTranslationId);
-        modelBuilder.Entity<GroupTranslationComic>()
-            .HasOne(gtc => gtc.Comic)
-            .WithMany(c => c.GroupTranslationComics)
-            .HasForeignKey(gtc => gtc.ComicId);
-        
-        modelBuilder.Entity<Comic>()
-            .HasOne(t => t.Category)
-            .WithMany(tl => tl.Comics)
-            .HasForeignKey(t => t.CategoryId);
-
-        modelBuilder.Entity<Comic>()
-            .HasOne(t => t.Artist)
-            .WithMany(tg => tg.Comics)
-            .HasForeignKey(t => t.ArtistId);
-
-        modelBuilder.Entity<Chapter>()
-            .HasOne(c => c.Comic)
-            .WithMany(t => t.Chapters)
-            .HasForeignKey(c => c.ComicId);
+        modelBuilder.Entity<ComicCategory>()
+            .HasKey(cg => new { cg.ComicId, cg.CategoryId });
+        modelBuilder.Entity<ComicCategory>()
+            .HasOne(cg => cg.Comic)
+            .WithMany(c => c.comicCategories)
+            .HasForeignKey(cg => cg.ComicId);
+        modelBuilder.Entity<ComicCategory>()
+            .HasOne(cg => cg.Category)
+            .WithMany(g => g.comicCategories)
+            .HasForeignKey(cg => cg.CategoryId);
     }
 }

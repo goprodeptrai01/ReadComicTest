@@ -4,9 +4,9 @@ namespace ReadMangaTest.Interfaces;
 
 public interface IArtistRepository
 {
-    Task<IList<Artist>> GetAll();
-    Task<Artist> GetById(int id);
-    Task Add(Artist artist);
-    Task Update(Artist artist);
-    Task Delete(int id);
+    Task<IList<Artist>> GetAllAsync();
+    Task<Artist> GetByIdAsync(int id);
+    Task AddAsync(Artist artist);
+    Task UpdateAsync(Artist artist);
+    Task DeleteAsync(int id);
 }

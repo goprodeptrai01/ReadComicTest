@@ -74,3 +74,5 @@ D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\obj\Debug\net7.0\refint\ReadMangaT
 D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\obj\Debug\net7.0\ReadMangaTest.pdb
 D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\obj\Debug\net7.0\ReadMangaTest.genruntimeconfig.cache
 D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\obj\Debug\net7.0\ref\ReadMangaTest.dll
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\AutoMapper.dll
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

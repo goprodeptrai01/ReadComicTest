@@ -14,27 +14,27 @@ public class ArtistRepository: IArtistRepository
         _context = context;
     }
 
-    public async Task<IList<Artist>> GetAll()
+    public async Task<IList<Artist>> GetAllAsync()
     {
         return await _context.Artists.ToListAsync();
     }
 
-    public async Task<Artist> GetById(int id)
+    public async Task<Artist> GetByIdAsync(int id)
     {
         return await _context.Artists.FindAsync(id);
     }
 
-    public async Task Add(Artist artist)
+    public async Task AddAsync(Artist artist)
     {
         await _context.Artists.AddAsync(artist);
     }
 
-    public async Task Update(Artist artist)
+    public async Task UpdateAsync(Artist artist)
     {
         _context.Artists.Update(artist);
     }
 
-    public async Task Delete(int id)
+    public async Task DeleteAsync(int id)
     {
         var artist = await _context.Artists.FindAsync(id);
         _context.Artists.Remove(artist);

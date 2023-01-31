@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using ReadMangaTest.Data;
 using ReadMangaTest.Interfaces;
 using ReadMangaTest.Models;
@@ -14,7 +15,7 @@ public class ComicRepository: IComicRepository
         _context = context;
     }
 
-    public async Task<List<Comic>> GetAllAsync()
+    public async Task<IEnumerable<Comic>> GetAllAsync()
     {
         return await _context.Comics.ToListAsync();
     }
@@ -26,8 +27,27 @@ public class ComicRepository: IComicRepository
 
     public async Task AddAsync(Comic comic)
     {
+        
         await _context.Comics.AddAsync(comic);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task AddArtistToComic(int artistId, Comic comic)
+    {
+        
+        var artist = await _context.Artists.FirstOrDefaultAsync(a => a.Id == artistId);
+        if (artist == null)
+        {
+            return;
+        }
+
+        var newArtist = new Comic()
+        {
+            Artist = artist,
+        };
+        _context.Add(newArtist);
+        _context.Add(comic);
+        // await _context.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(Comic comic)

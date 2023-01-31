@@ -4,9 +4,10 @@ namespace ReadMangaTest.Interfaces;
 
 public interface IComicRepository
 {
-    Task<List<Comic>> GetAllAsync();
+    Task<IEnumerable<Comic>> GetAllAsync();
     Task<Comic> GetByIdAsync(int id);
     Task AddAsync(Comic comic);
+    Task AddArtistToComic(int artistId, Comic comic);
     Task UpdateAsync(Comic comic);
     Task DeleteAsync(int id);
 }

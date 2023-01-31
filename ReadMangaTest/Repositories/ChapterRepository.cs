@@ -14,7 +14,7 @@ public class ChapterRepository : IChapterRepository
         _context = context;
     }
 
-    public async Task<List<Chapter>> GetAllAsync()
+    public async Task<IEnumerable<Chapter>> GetAllAsync()
     {
         return await _context.Chapters.ToListAsync();
     }
