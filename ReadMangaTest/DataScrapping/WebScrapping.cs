@@ -10,25 +10,84 @@ public class WebScrapping
 
     public WebScrapping(DataContext context)
     {
+        Console.WriteLine("welcome to scraping");
         _context = context;
     }
 
-    public void ScrapeData()
+    private HtmlNodeCollection GetHtmlNodes(string url, string xPath)
     {
-        Console.WriteLine("welcome to scraping");
-        // URL of the web page you want to scrape data from
-        var url = "https://www.nettruyenup.com";
-
         // Use HtmlWeb to download the HTML content of the web page
         var htmlWeb = new HtmlWeb();
         var htmlDocument = htmlWeb.Load(url);
-
+        
         // Use BeautifulSoup to parse the HTML content
         var htmlSoup = new HtmlAgilityPack.HtmlDocument();
         htmlSoup.LoadHtml(htmlDocument.DocumentNode.OuterHtml);
-
+        
         // Select the HTML nodes that contain the data you want to scrape
-        var comicNodes = htmlSoup.DocumentNode.SelectNodes(
+        return htmlSoup.DocumentNode.SelectNodes(xPath);
+    }
+    private HtmlNode GetHtmlNode(string url, string xPath)
+    {
+        // Use HtmlWeb to download the HTML content of the web page
+        var htmlWeb = new HtmlWeb();
+        var htmlDocument = htmlWeb.Load(url);
+        
+        // Use BeautifulSoup to parse the HTML content
+        var htmlSoup = new HtmlAgilityPack.HtmlDocument();
+        htmlSoup.LoadHtml(htmlDocument.DocumentNode.OuterHtml);
+        
+        // Select the HTML nodes that contain the data you want to scrape
+        return htmlSoup.DocumentNode.SelectSingleNode(xPath);
+    }
+
+    public void ScrapeCategory()
+    {
+        
+        // URL of the web page you want to scrape data from
+        var url = "https://www.nettruyenup.com";
+
+        var categoryGrandNode = GetHtmlNode(url,"//body//nav[@id='mainNav']//li[@class='dropdown']//ul[@class='nav']//li");
+
+        var categoryNodes = categoryGrandNode.SelectNodes(".//ul[@class='nav']//li");
+        
+        var categories = new List<Category>();
+        
+        foreach (var categoryNode in categoryNodes)
+        {
+            var nameCategory = "";
+            if (categoryNode.SelectSingleNode(".//a//strong") is not null)
+            {
+                Console.WriteLine(categoryNode.SelectSingleNode(".//a//strong").InnerHtml.Trim());
+                nameCategory = categoryNode.SelectSingleNode(".//a//strong").InnerText.Trim();
+            }
+            else
+            {
+                Console.WriteLine(categoryNode.SelectSingleNode(".//a").InnerHtml.Trim());
+                nameCategory = categoryNode.SelectSingleNode(".//a").InnerText.Trim();
+            }
+
+            var category = new Category()
+            {
+                Name = nameCategory,
+                Description = ""
+            };
+            Console.WriteLine(category.Name);
+            categories.Add(category);
+        }
+        
+        return;
+        _context.Categories.AddRange(categories);
+        _context.SaveChanges();
+        Console.WriteLine("Data has been saved to the database successfully");
+    }
+
+    public void ScrapeComicAndArtist()
+    {
+        // URL of the web page you want to scrape data from
+        var url = "https://www.nettruyenup.com";
+
+        var comicNodes = GetHtmlNodes(url, 
             "//main[@class='main']//div[@class='container']//div[@class='row']//div[@class='row']//div[@class='item']");
         Console.WriteLine(1);
         if (comicNodes == null)
@@ -56,13 +115,8 @@ public class WebScrapping
             Console.WriteLine(count);
             count++;
             string detailUrl = comicNode.SelectSingleNode(".//div//a").Attributes["href"].Value;
-            var detailHtmlWeb = new HtmlWeb();
-            var detailHtmlWebHtmlDocument = htmlWeb.Load(detailUrl);
 
-            var detailHtmlSoup = new HtmlAgilityPack.HtmlDocument();
-            detailHtmlSoup.LoadHtml(detailHtmlWebHtmlDocument.DocumentNode.OuterHtml);
-
-            var detailComicNode = detailHtmlSoup.DocumentNode.SelectSingleNode(
+            var detailComicNode = GetHtmlNode(detailUrl, 
                 "//main[@class='main']//div[@class='container']//div[@class='row']//div[@class='detail-info']//ul[@class='list-info']");
 
             var nameArtist = detailComicNode.SelectSingleNode(".//li[@class='author row']//p[@class='col-xs-8']//a");
@@ -98,7 +152,7 @@ public class WebScrapping
 
 
         artists = artists.Distinct().ToList();
-
+        return;
         // Save the extracted data to the database
         _context.Artists.AddRange(artists);
         _context.Comics.AddRange(comics);
