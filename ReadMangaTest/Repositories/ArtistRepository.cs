@@ -24,6 +24,11 @@ public class ArtistRepository: IArtistRepository
         return await _context.Artists.FindAsync(id);
     }
 
+    public async Task<Artist> GetByNameAsync(string name)
+    {
+        return await _context.Artists.FirstOrDefaultAsync(x => x.Name.Equals(name));
+    }
+
     public async Task AddAsync(Artist artist)
     {
         await _context.Artists.AddAsync(artist);
@@ -38,5 +43,15 @@ public class ArtistRepository: IArtistRepository
     {
         var artist = await _context.Artists.FindAsync(id);
         _context.Artists.Remove(artist);
+    }
+
+    public async Task<bool> IsArtistExistsAsync(int id)
+    {
+        return await _context.Artists.AnyAsync(x => x.Id == id);
+    }
+
+    public async Task<bool> IsArtistExistsAsync(string name)
+    {
+        return await _context.Artists.AnyAsync(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
     }
 }

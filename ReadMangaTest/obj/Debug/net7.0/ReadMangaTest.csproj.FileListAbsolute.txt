@@ -76,3 +76,5 @@ D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\obj\Debug\net7.0\ReadMangaTest.gen
 D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\obj\Debug\net7.0\ref\ReadMangaTest.dll
 D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\AutoMapper.dll
 D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\HtmlAgilityPack.dll
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\Newtonsoft.Json.dll

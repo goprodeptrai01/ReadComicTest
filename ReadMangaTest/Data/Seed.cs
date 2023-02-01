@@ -82,8 +82,8 @@ public class Seed
                     }
                 }
             };
-            _context.ComicCategories.AddRange(comicCategories);
-            _context.SaveChanges();
+            // _context.ComicCategories.AddRange(comicCategories);
+            // _context.SaveChanges();
         }
     }
 }
