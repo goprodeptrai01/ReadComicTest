@@ -136,9 +136,45 @@ public class ComicRepository : IComicRepository
         }
     }
 
-    public Task<bool> UpdateComicCategoryAsync(int id, int[] categoryId)
+    public async Task<bool> UpdateComicCategoryAsync(int id, int[] categoryIds)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var comic = await _context.Comics.Where(c => c.Id == id && !c.IsHidden).FirstOrDefaultAsync();
+
+            if (comic == null)
+                throw new Exception("Comic not found");
+
+            var categories = _context.Categories.Count(c => categoryIds.Contains(c.Id) && !c.IsHidden);
+            if (categories != categoryIds.Length)
+            {
+                throw new Exception("one or more categories Not found");
+            }
+
+            var idComicCategories = await _context.ComicCategories.Where(cc => cc.ComicId == id).ToListAsync();
+            _context.ComicCategories.RemoveRange(idComicCategories);
+            
+            var comicCategories = new List<ComicCategory>();
+            foreach (var categoryId in categoryIds)
+            {
+                var comicCategory = new ComicCategory
+                {
+                    CategoryId = categoryId,
+                    ComicId = id
+                };
+                comicCategories.Add(comicCategory);
+            }
+            
+            _context.ComicCategories.AddRange(comicCategories);
+            await _context.SaveChangesAsync();
+            
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception(e.Message);
+        }
     }
 
     public Task<bool> UpdateComicArtistAsync(int id, int[] artistId)

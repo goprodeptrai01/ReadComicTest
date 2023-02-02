@@ -162,6 +162,29 @@ public class ComicController : ControllerBase
         }
     }
 
+    [HttpPut("{comicId}&{categoryIds}/category")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    public async Task<IActionResult> PutComicCategory([FromRoute] int comicId, [FromRoute] string categoryIds)
+    {
+        if (!_comicRepository.IsExists(comicId))
+            return NotFound("comic is not exists");
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        try
+        {
+            var categoryIdArray = categoryIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            await _comicRepository.UpdateComicCategoryAsync(comicId, categoryIdArray);
+            return Ok("Updated!");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
     [HttpDelete("{id}")]
     [ProducesResponseType(200, Type = typeof(Comic))]
     [ProducesResponseType(400)]
