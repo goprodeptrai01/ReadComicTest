@@ -1,4 +1,5 @@
 ﻿using ReadMangaTest.DTO;
+using ReadMangaTest.Filters;
 using ReadMangaTest.Models;
 
 namespace ReadMangaTest.Interfaces;
@@ -6,7 +7,7 @@ namespace ReadMangaTest.Interfaces;
 public interface IComicRepository
 {
     //get api methods
-    Task<IEnumerable<ComicDto>> GetAllAsync();
+    Task<List<ComicDto>> GetAllAsync(PaginationFilter filter);
     Task<ComicDto> GetByIdAsync(int id);
     Task<ComicDto> GetByNameAsync(string name);
     Task<IEnumerable<ComicDto>> GetByCategoryAsync(int categoryId);

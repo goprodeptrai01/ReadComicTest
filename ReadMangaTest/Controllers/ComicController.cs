@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ReadMangaTest.Data;
 using ReadMangaTest.DTO;
+using ReadMangaTest.Filters;
+using ReadMangaTest.Helper;
 using ReadMangaTest.Interfaces;
 using ReadMangaTest.Models;
 
@@ -17,29 +20,38 @@ public class ComicController : ControllerBase
     private readonly IChapterRepository _chapterRepository;
     private readonly DataContext _context;
     private readonly IMapper _mapper;
+    private readonly IUriService _uriService;
 
     public ComicController(IComicRepository repository, IArtistRepository artistRepository, DataContext context,
-        IMapper mapper, ICategoryRepository categoryRepository, IChapterRepository chapterRepository)
+        IMapper mapper, ICategoryRepository categoryRepository, IChapterRepository chapterRepository, IUriService uriService)
     {
         _comicRepository = repository;
         _artistRepository = artistRepository;
         _categoryRepository = categoryRepository;
         _chapterRepository = chapterRepository;
+        _uriService = uriService;
         _context = context;
         _mapper = mapper;
     }
 
     [HttpGet]
-    [ProducesResponseType(200, Type = typeof(IEnumerable<Comic>))]
+    [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> GetComics()
+    public async Task<IActionResult> GetComics([FromQuery] PaginationFilter filter)
     {
         try
         {
-            var comics = await _comicRepository.GetAllAsync();
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            return Ok(comics);
+            var route = Request.Path.Value;
+            
+            var validFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
+            
+            var comics = await _comicRepository.GetAllAsync(filter);
+
+            var totalRecords = await _context.Comics.CountAsync();
+            var pagedReponse = PaginationHelper.CreatePagedReponse<ComicDto>(comics, validFilter, totalRecords, _uriService, route);
+            return Ok(pagedReponse);
         }
         catch (Exception e)
         {

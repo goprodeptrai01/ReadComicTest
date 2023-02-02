@@ -3,6 +3,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using ReadMangaTest.Data;
 using ReadMangaTest.DTO;
+using ReadMangaTest.Filters;
 using ReadMangaTest.Interfaces;
 using ReadMangaTest.Models;
 
@@ -19,9 +20,10 @@ public class ComicRepository : IComicRepository
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<ComicDto>> GetAllAsync()
+    public async Task<List<ComicDto>> GetAllAsync(PaginationFilter filter)
     {
-        return await _context.Comics.Where(c => c.IsHidden == false)
+        var validFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
+        var data = await _context.Comics.Where(c => c.IsHidden == false)
             .Include(c => c.ComicCategories)
             .ThenInclude(cc => cc.Category)
             .Include(c => c.Artist)
@@ -35,7 +37,11 @@ public class ComicRepository : IComicRepository
                 Categories = c.ComicCategories
                     .Select(cc => cc.Category.Name)
                     .ToList()
-            }).ToListAsync();
+            })
+            .Skip((validFilter.PageNumber - 1) * validFilter.PageSize)
+            .Take(validFilter.PageSize)
+            .ToListAsync();
+        return data;
     }
 
     public async Task<ComicDto> GetByIdAsync(int id)

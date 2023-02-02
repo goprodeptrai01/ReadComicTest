@@ -16,16 +16,22 @@ builder.Services.AddControllers().AddJsonOptions(x =>
     x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull);
-builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IComicRepository, ComicRepository>();
 builder.Services.AddScoped<IChapterRepository, ChapterRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IArtistRepository, ArtistRepository>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<IUriService>(o =>
+{
+    var accessor = o.GetRequiredService<IHttpContextAccessor>();
+    var request = accessor.HttpContext.Request;
+    var uri = string.Concat(request.Scheme, "://", request.Host.ToUriComponent());
+    return new UriService(uri);
+});
 builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.PropertyNamingPolicy = null;
-    });
+    .AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = null; });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -51,6 +57,7 @@ var app = builder.Build();
 
 if (args.Length == 1 && args[0].ToLower() == "scrapecomic")
     ScrapeComic(app);
+
 void ScrapeComic(IHost app)
 {
     Console.WriteLine("Starting scraping...");
@@ -66,12 +73,13 @@ void ScrapeComic(IHost app)
                 Console.WriteLine("Scraping...");
                 service.ScrapeComicAndArtist();
             }
-        } 
+        }
     }
 }
 
 if (args.Length == 1 && args[0].ToLower() == "scrapecategory")
     ScrapeCategory(app);
+
 void ScrapeCategory(IHost app)
 {
     Console.WriteLine("Starting scraping...");
@@ -87,7 +95,7 @@ void ScrapeCategory(IHost app)
                 Console.WriteLine("Scraping...");
                 service.ScrapeCategory();
             }
-        } 
+        }
     }
 }
 
