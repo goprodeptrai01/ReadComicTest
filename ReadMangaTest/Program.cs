@@ -44,9 +44,9 @@ void SeedData(IHost app)
         }
 }
 
-if (args.Length == 1 && args[0].ToLower() == "scrape")
-    ScrapeData(app);
-void ScrapeData(IHost app)
+if (args.Length == 1 && args[0].ToLower() == "scrapecomic")
+    ScrapeComic(app);
+void ScrapeComic(IHost app)
 {
     Console.WriteLine("Starting scraping...");
     var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
@@ -59,7 +59,28 @@ void ScrapeData(IHost app)
             if (service != null)
             {
                 Console.WriteLine("Scraping...");
-                service.ScrapeData();
+                service.ScrapeComicAndArtist();
+            }
+        } 
+    }
+}
+
+if (args.Length == 1 && args[0].ToLower() == "scrapecategory")
+    ScrapeCategory(app);
+void ScrapeCategory(IHost app)
+{
+    Console.WriteLine("Starting scraping...");
+    var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
+
+    if (scopedFactory != null)
+    {
+        using (var scope = scopedFactory.CreateScope())
+        {
+            var service = scope.ServiceProvider.GetService<WebScrapping>();
+            if (service != null)
+            {
+                Console.WriteLine("Scraping...");
+                service.ScrapeCategory();
             }
         } 
     }
