@@ -41,42 +41,50 @@ public class WebScrapping
         return htmlSoup.DocumentNode.SelectSingleNode(xPath);
     }
 
-    public void ScrapeCategory()
+    public List<Category> ScrapeCategory()
     {
         
         // URL of the web page you want to scrape data from
         var url = "https://www.nettruyenup.com";
 
-        var categoryGrandNode = GetHtmlNode(url,"//body//nav[@id='mainNav']//li[@class='dropdown']//ul[@class='nav']//li");
+        var categoryGrandNode = GetHtmlNode(url,"//body//nav[@id='mainNav']//li[@class='dropdown']");
 
         var categoryNodes = categoryGrandNode.SelectNodes(".//ul[@class='nav']//li");
-        
+        // Console.WriteLine(categoryNodes);
         var categories = new List<Category>();
+        if (categoryNodes == null)
+        {
+            Console.WriteLine("No data found on the web page");
+            return null;
+        }
+
         
         foreach (var categoryNode in categoryNodes)
         {
+            var detailUrls = categoryNode.SelectSingleNode(".//a").Attributes["href"].Value;
+            
+            var descriptionCategory = GetHtmlNode(detailUrls, "//main[@class='main']//div[@class='container']//div[@id='ctl00_mainContent_ctl00_divDescription']//div").InnerHtml.Trim();        
             var nameCategory = "";
             if (categoryNode.SelectSingleNode(".//a//strong") is not null)
             {
-                Console.WriteLine(categoryNode.SelectSingleNode(".//a//strong").InnerHtml.Trim());
                 nameCategory = categoryNode.SelectSingleNode(".//a//strong").InnerText.Trim();
             }
             else
             {
-                Console.WriteLine(categoryNode.SelectSingleNode(".//a").InnerHtml.Trim());
                 nameCategory = categoryNode.SelectSingleNode(".//a").InnerText.Trim();
             }
 
             var category = new Category()
             {
                 Name = nameCategory,
-                Description = ""
+                Description = descriptionCategory
             };
-            Console.WriteLine(category.Name);
+            // Console.WriteLine(category.Name);
+            // Console.WriteLine(category.Description);
             categories.Add(category);
         }
-        
-        return;
+        return categories;
+        // return;
         _context.Categories.AddRange(categories);
         _context.SaveChanges();
         Console.WriteLine("Data has been saved to the database successfully");
@@ -101,8 +109,13 @@ public class WebScrapping
 
         // Loop through the selected HTML nodes and extract the data
         Console.WriteLine(3);
+        var categoryList = ScrapeCategory();
+
+        
         var comics = new List<Comic>();
         var artists = new List<Artist>();
+        var categories = new List<Category>();
+        var comicCategories = new List<ComicCategory>();
         var nullArtist = new Artist()
         {
             Name = "IsUpdating",
@@ -120,6 +133,8 @@ public class WebScrapping
                 "//main[@class='main']//div[@class='container']//div[@class='row']//div[@class='detail-info']//ul[@class='list-info']");
 
             var nameArtist = detailComicNode.SelectSingleNode(".//li[@class='author row']//p[@class='col-xs-8']//a");
+            
+            var nameCategories = detailComicNode.SelectNodes(".//li[@class='kind row']//p[@class='col-xs-8']//a");
 
             Artist artist;
             if (nameArtist == null)
@@ -128,7 +143,7 @@ public class WebScrapping
             }
             else
             {
-                Console.WriteLine(nameArtist.InnerHtml.Trim());
+                // Console.WriteLine(nameArtist.InnerHtml.Trim());
 
                 artist = new Artist()
                 {
@@ -144,18 +159,62 @@ public class WebScrapping
                 Wallpaper = comicNode.SelectSingleNode(".//a//img").Attributes["data-original"].Value,
                 Artist = artist
             };
-            Console.WriteLine(comic.Name);
-            Console.WriteLine(comic.Artist.Name);
+            
+            foreach (var nameCategory in nameCategories)
+            {
+                var categoryName = nameCategory.InnerHtml.Trim();
+                foreach (var category in categoryList)
+                {
+                    if (category.Name.Equals(categoryName))
+                    {
+                        var comicCategory = new ComicCategory()
+                        {
+                            Comic = comic,
+                            Category = category
+                        };
+                        comicCategories.Add(comicCategory);
+                    }
+
+                }
+            }
+
+
+            // Console.WriteLine(comic.Name);
+            // Console.WriteLine(comic.Artist.Name);
             artists.Add(artist);
             comics.Add(comic);
         }
-
-
         artists = artists.Distinct().ToList();
-        return;
+        // Console.WriteLine("\nManga: ");
+        // foreach (var comic in comics)
+        // {
+        //     Console.WriteLine(comic.Id);
+        //     Console.WriteLine(comic.Name);
+        // }
+        // Console.WriteLine("\nArtist: ");
+        // foreach (var artist in artists)
+        // {
+        //     Console.WriteLine(artist.Id);
+        //     Console.WriteLine(artist.Name);
+        // }
+        // Console.WriteLine("\nCategory: ");
+        // foreach (var category in categoryList)
+        // {
+        //     Console.WriteLine(category.Id);
+        //     Console.WriteLine(category.Name);
+        // }
+        // Console.WriteLine("\nComic category: ");
+        // foreach (var comicCategory in comicCategories)
+        // {
+        //     Console.WriteLine("Comic: "+comicCategory.ComicId);
+        //     Console.WriteLine("Category: "+comicCategory.CategoryId);
+        // }
+        // return;
         // Save the extracted data to the database
         _context.Artists.AddRange(artists);
         _context.Comics.AddRange(comics);
+        _context.Categories.AddRange(categoryList);
+        _context.ComicCategories.AddRange(comicCategories);
         _context.SaveChanges();
 
         Console.WriteLine("Data has been saved to the database successfully");

@@ -44,7 +44,7 @@ void SeedData(IHost app)
         }
 }
 
-if (args.Length == 1 && args[0].ToLower() == "scrapeComic")
+if (args.Length == 1 && args[0].ToLower() == "scrapecomic")
     ScrapeComic(app);
 void ScrapeComic(IHost app)
 {
@@ -65,7 +65,7 @@ void ScrapeComic(IHost app)
     }
 }
 
-if (args.Length == 1 && args[0].ToLower() == "scrapeCategory")
+if (args.Length == 1 && args[0].ToLower() == "scrapecategory")
     ScrapeCategory(app);
 void ScrapeCategory(IHost app)
 {
