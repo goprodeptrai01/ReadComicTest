@@ -38,26 +38,95 @@ public class ComicRepository : IComicRepository
             }).ToListAsync();
     }
 
-    public async Task<Comic> GetByIdAsync(int id)
+    public async Task<ComicDto> GetByIdAsync(int id)
     {
-        return await _context.Comics.Where(c => c.IsHidden == false && c.Id == id).FirstOrDefaultAsync();
+        var comic = await _context.Comics.Where(c => c.IsHidden == false && c.Id == id)
+            .Include(c => c.ComicCategories)
+            .ThenInclude(cc => cc.Category)
+            .Include(c => c.Artist)
+            .Select(c => new ComicDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Description = c.Description,
+                Wallpaper = c.Wallpaper,
+                Artist = c.Artist.Name,
+                Categories = c.ComicCategories
+                    .Select(cc => cc.Category.Name)
+                    .ToList()
+            })
+            .FirstOrDefaultAsync();
+        if (comic == null)
+        {
+            return null;
+        }   
+        return _mapper.Map<ComicDto>(comic);
     }
 
-    public async Task<Comic> GetByNameAsync(string name)
+    public async Task<ComicDto> GetByNameAsync(string name)
     {
-        return await _context.Comics.Where(c => c.IsHidden == false && c.Name == name).FirstOrDefaultAsync();
+        var comic = await _context.Comics.Where(c => c.IsHidden == false && c.Name == name)
+            .Include(c => c.ComicCategories)
+            .ThenInclude(cc => cc.Category)
+            .Include(c => c.Artist)
+            .Select(c => new ComicDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Description = c.Description,
+                Wallpaper = c.Wallpaper,
+                Artist = c.Artist.Name,
+                Categories = c.ComicCategories
+                    .Select(cc => cc.Category.Name)
+                    .ToList()
+            })
+            .FirstOrDefaultAsync();
+        if (comic == null)
+        {
+            return null;
+        }   
+        return _mapper.Map<ComicDto>(comic);
     }
 
-    public async Task<IEnumerable<Comic>> GetByCategoryAsync(int categoryId)
+    public async Task<IEnumerable<ComicDto>> GetByCategoryAsync(int categoryId)
     {
         return await _context.Comics
             .Where(c => c.IsHidden == false && c.ComicCategories.Any(cc => cc.CategoryId == categoryId))
+            .Include(c => c.ComicCategories)
+            .ThenInclude(cc => cc.Category)
+            .Include(c => c.Artist)
+            .Select(c => new ComicDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Description = c.Description,
+                Wallpaper = c.Wallpaper,
+                Artist = c.Artist.Name,
+                Categories = c.ComicCategories
+                    .Select(cc => cc.Category.Name)
+                    .ToList()
+            })
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Comic>> GetByArtistIdAsync(int artistId)
+    public async Task<IEnumerable<ComicDto>> GetByArtistIdAsync(int artistId)
     {
-        return await _context.Comics.Where(c => c.Artist.Id == artistId && c.IsHidden == false).ToListAsync();
+        return await _context.Comics.Where(c => c.Artist.Id == artistId && c.IsHidden == false)
+            .Include(c => c.ComicCategories)
+            .ThenInclude(cc => cc.Category)
+            .Include(c => c.Artist)
+            .Select(c => new ComicDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Description = c.Description,
+                Wallpaper = c.Wallpaper,
+                Artist = c.Artist.Name,
+                Categories = c.ComicCategories
+                    .Select(cc => cc.Category.Name)
+                    .ToList()
+            })
+            .ToListAsync();
     }
 
     public bool IsExists(int id)

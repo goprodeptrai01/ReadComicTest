@@ -7,10 +7,10 @@ public interface IComicRepository
 {
     //get api methods
     Task<IEnumerable<ComicDto>> GetAllAsync();
-    Task<Comic> GetByIdAsync(int id);
-    Task<Comic> GetByNameAsync(string name);
-    Task<IEnumerable<Comic>> GetByCategoryAsync(int categoryId);
-    Task<IEnumerable<Comic>> GetByArtistIdAsync(int artistId);
+    Task<ComicDto> GetByIdAsync(int id);
+    Task<ComicDto> GetByNameAsync(string name);
+    Task<IEnumerable<ComicDto>> GetByCategoryAsync(int categoryId);
+    Task<IEnumerable<ComicDto>> GetByArtistIdAsync(int artistId);
     //check methods
     bool IsExists(int id);
     bool IsExists(string name);
