@@ -24,6 +24,16 @@ public class CategoryRepository : ICategoryRepository
         return await _context.Categories.FindAsync(id);
     }
 
+    public bool IsExists(int id)
+    {
+        return _context.Categories.Any(x => x.Id == id && x.IsHidden == false);
+    }
+
+    public bool IsExists(string name)
+    {
+        return _context.Categories.Any(x => x.Name == name && x.IsHidden == false);
+    }
+
     public async Task AddAsync(Category category)
     {
         _context.Categories.Add(category);

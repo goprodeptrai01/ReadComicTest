@@ -8,7 +8,7 @@ using ReadMangaTest.Models;
 
 namespace ReadMangaTest.Controllers;
 
-[Route("api/[controller]")]
+[Route("v1/api/comic")]
 [ApiController]
 public class ComicController : ControllerBase
 {
@@ -32,70 +32,69 @@ public class ComicController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(200, Type = typeof(IEnumerable<Comic>))]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> GetComics()
     {
         try
         {
             var comics = await _comicRepository.GetAllAsync();
-
-
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
-
             return Ok(comics);
-
         }
         catch (Exception e)
         {
             return StatusCode(500, "Internal Server Error" + e.Message);
         }
 
-    }
-
-    [HttpGet("artist/{artistId}")]
-    [ProducesResponseType(200, Type = typeof(IEnumerable<Comic>))]
-    public async Task<IActionResult> GetComicsByArtist(int artistId)
-    {
-        try
-        {
-            var comics = await _comicRepository.GetByArtistIdAsync(artistId);
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            return Ok(comics);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, "Internal Server Error " + e.Message);
-        }
     }
     
-
     [HttpGet("{id}")]
     [ProducesResponseType(200, Type = typeof(Comic))]
-    [ProducesResponseType(400)]
-    public async Task<IActionResult> GetComic(int id)
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> GetComicAsync(int id)
     {
-        // if (!_characterRepository.AnyCharacterExists(id))
-        //     return NotFound();
-        try
-        {
-            var comic = await _comicRepository.GetByIdAsync(id);
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        if (!_comicRepository.IsExists(id))
+            return NotFound();
 
-            return Ok(comic);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, "Internal Server Error" + e.Message);
-        }
+        var comic = await _comicRepository.GetByIdAsync(id);
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        return Ok(comic);
+    }
+    
+    [HttpGet("category/{categoryId}")]
+    [ProducesResponseType(200, Type = typeof(IEnumerable<Comic>))]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> GetComicByCategoryAsync(int categoryId)
+    {
+        if (!_categoryRepository.IsExists(categoryId))
+            return NotFound();
+
+        var comics = await _comicRepository.GetByCategoryAsync(categoryId);
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        return Ok(comics);
+    }
+    
+    [HttpGet("artist/{artistId}")]
+    [ProducesResponseType(200, Type = typeof(IEnumerable<Comic>))]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> GetComicByArtistAsync(int artistId)
+    {
+        if (!_categoryRepository.IsExists(artistId))
+            return NotFound();
+
+        var comics = await _comicRepository.GetByArtistIdAsync(artistId);
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        return Ok(comics);
     }
 
     [HttpPost("{artistId}")]

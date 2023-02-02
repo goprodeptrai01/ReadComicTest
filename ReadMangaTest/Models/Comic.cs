@@ -14,8 +14,8 @@ public class Comic
     public string Description { get; set; }
     public string Wallpaper { get; set; }
     public Artist Artist { get; set; }
+    public bool IsHidden { get; set; } = false;
     public virtual ICollection<Chapter> Chapters { get; set; }
-    
     public ICollection
-        <ComicCategory> comicCategories { get; set; }
+        <ComicCategory> ComicCategories { get; set; }
 }
