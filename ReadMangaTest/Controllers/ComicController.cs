@@ -205,19 +205,86 @@ public class ComicController : ControllerBase
             throw;
         }
     }
-
-    [HttpDelete("{id}")]
-    [ProducesResponseType(200, Type = typeof(Comic))]
+    
+    [HttpPut("{comicId}/store")]
+    [ProducesResponseType(204)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> DeleteComic(int id)
+    public async Task<IActionResult> ArchiveAsync([FromRoute] int comicId)
     {
-        var comic = await _comicRepository.GetByIdAsync(id);
-        if (comic == null)
-        {
-            return NotFound();
-        }
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-        await _comicRepository.DeleteAsync(id);
-        return NoContent();
+        try
+        {
+            await _comicRepository.StoreAsync(comicId);
+            return Ok("Stored!");
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e);
+        }
     }
+    
+    [HttpPut("{comicId}/multipal-store")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    public async Task<IActionResult> MultiStoreAsync([FromRoute] string comicId)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        try
+        {
+            var comicIdArray = comicId.Split(',').Select(int.Parse).ToArray();
+            
+            await _comicRepository.MultiStoreAsync(comicIdArray);
+            return Ok("Stored!");
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e);
+        }
+    }
+    
+    [HttpDelete("{comicId}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    public async Task<IActionResult> DeleteAsync(int comicId)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        try
+        {
+            await _comicRepository.DeleteAsync(comicId);
+            return Ok("Deleted!");
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e);
+        }
+    }
+    
+    [HttpDelete("{comicId}/multipal-delete")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    public async Task<IActionResult> MultiDeleteAsync([FromRoute] string comicId)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        try
+        {
+            var comicIdArray = comicId.Split(',').Select(int.Parse).ToArray();
+            
+            await _comicRepository.MultiDeleteAsync(comicIdArray);
+            return Ok("Deleted!");
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e);
+        }
+    }
+
+    
 }

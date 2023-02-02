@@ -205,25 +205,96 @@ public class ComicRepository : IComicRepository
         }
     }
 
-    public Task StoreAsync(int id)
+    public async Task StoreAsync(int id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var comic = await _context.Comics.Where(c => c.Id == id).FirstOrDefaultAsync();
+            if (comic == null)
+                throw new Exception("Comic not found");
+            
+            comic.IsHidden = !comic.IsHidden;
+            _context.Comics.Update(comic);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception(e.Message);
+        }
     }
 
-    public Task MultiStoreAsync(int[] id)
+    public async Task MultiStoreAsync(int[] id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var checkValid = _context.Comics.Count(c => id.Contains(c.Id));
+            if (checkValid != id.Length)
+            {
+                throw new Exception("One or more comics Not Found");
+            }
+            
+            var comics = await _context.Comics.Where(c => id.Contains(c.Id)).ToListAsync();
+            foreach (var comic in comics)
+            {
+                comic.IsHidden =!comic.IsHidden;
+            }
+            _context.Comics.UpdateRange(comics);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception(e.Message);
+        }
     }
 
     public async Task DeleteAsync(int id)
     {
-        var comic = await _context.Comics.FindAsync(id);
-        _context.Comics.Remove(comic);
-        await _context.SaveChangesAsync();
+        try
+        {
+            var comic = await _context.Comics.FindAsync(id);
+            if (comic == null)
+                throw new Exception("Comic not found!");
+            _context.Comics.Remove(comic);
+            
+            var comicCategories = await _context.ComicCategories.Where(cc => cc.ComicId == id).ToListAsync();
+            if (comicCategories == null)
+                throw new Exception("Comic category not found!");
+            _context.ComicCategories.RemoveRange(comicCategories);
+
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception(e.Message);        }
     }
 
-    public Task MultiDeleteAsync(int[] id)
+    public async Task MultiDeleteAsync(int[] id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var checkValid = _context.Comics.Count(c => id.Contains(c.Id));
+            if (checkValid != id.Length)
+            {
+                throw new Exception("One or more comics Not Found");
+            }
+
+            var comics = await _context.Comics.Where(c => id.Contains(c.Id)).ToListAsync();
+            _context.Comics.RemoveRange(comics);
+            
+            var comicCategories = await _context.ComicCategories.Where(cc => id.Contains(cc.ComicId)).ToListAsync();
+            if (comicCategories == null)
+                throw new Exception("Comic category not found!");
+            _context.ComicCategories.RemoveRange(comicCategories);
+            
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception(e.Message);
+        }
     }
 }
