@@ -99,7 +99,7 @@ public class ComicController : ControllerBase
     [HttpPost("{categoryIds}&{artistId}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> PostComic([FromBody] PostComicDto comicDto, [FromRoute] string categoryIds, [FromRoute] int artistId)
+    public async Task<IActionResult> PostComicAsync([FromBody] PostComicDto comicDto, [FromRoute] string categoryIds, [FromRoute] int artistId)
     {
         if (!ModelState.IsValid)
         {
@@ -130,7 +130,7 @@ public class ComicController : ControllerBase
     [HttpPut("{comicId}")]
     [ProducesResponseType(200, Type = typeof(Comic))]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> PutComic([FromRoute] int comicId, [FromBody] PostComicDto comicDto)
+    public async Task<IActionResult> PutComicAsync([FromRoute] int comicId, [FromBody] PostComicDto comicDto)
     {
         if (!ModelState.IsValid)
         {
@@ -165,7 +165,7 @@ public class ComicController : ControllerBase
     [HttpPut("{comicId}&{categoryIds}/category")]
     [ProducesResponseType(204)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> PutComicCategory([FromRoute] int comicId, [FromRoute] string categoryIds)
+    public async Task<IActionResult> PutComicCategoryAsync([FromRoute] int comicId, [FromRoute] string categoryIds)
     {
         if (!_comicRepository.IsExists(comicId))
             return NotFound("comic is not exists");
@@ -176,6 +176,27 @@ public class ComicController : ControllerBase
         {
             var categoryIdArray = categoryIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
             await _comicRepository.UpdateComicCategoryAsync(comicId, categoryIdArray);
+            return Ok("Updated!");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+    [HttpPut("{comicId}&{artistId}/artist")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    public async Task<IActionResult> PutComicAsync([FromRoute] int comicId, [FromRoute] int artistId)
+    {
+        if (!_comicRepository.IsExists(comicId))
+            return NotFound("comic is not exists");
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        try
+        {
+            await _comicRepository.UpdateComicArtistAsync(comicId, artistId);
             return Ok("Updated!");
         }
         catch (Exception e)

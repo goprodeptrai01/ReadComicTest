@@ -19,7 +19,7 @@ public interface IComicRepository
     //put api methods
     Task<ComicDto> UpdateAsync(PostComicDto comicDto, int id);
     Task<bool> UpdateComicCategoryAsync(int id, int[] categoryId);
-    Task<bool> UpdateComicArtistAsync(int id, int[] artistId);
+    Task<bool> UpdateComicArtistAsync(int id, int artistId);
     //remove, store api methods
     Task StoreAsync(int id);
     Task MultiStoreAsync(int[] id);

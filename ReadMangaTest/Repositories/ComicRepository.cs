@@ -177,9 +177,32 @@ public class ComicRepository : IComicRepository
         }
     }
 
-    public Task<bool> UpdateComicArtistAsync(int id, int[] artistId)
+    public async Task<bool> UpdateComicArtistAsync(int id, int artistId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var comic = await _context.Comics.Where(c => c.Id == id && !c.IsHidden).FirstOrDefaultAsync();
+
+            if (comic == null)
+                throw new Exception("Comic not found");
+            
+            var artist = await _context.Artists.Where(a => a.Id == artistId && !a.IsHidden).FirstOrDefaultAsync();
+            if (artist == null)
+            {
+                throw new Exception("Artist Not Found");
+            }
+            
+            comic.Artist = artist;
+            _context.Comics.Update(comic);
+            await _context.SaveChangesAsync();
+            
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception(e.Message);
+        }
     }
 
     public Task StoreAsync(int id)
