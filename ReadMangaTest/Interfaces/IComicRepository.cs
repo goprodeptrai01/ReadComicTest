@@ -15,9 +15,9 @@ public interface IComicRepository
     bool IsExists(int id);
     bool IsExists(string name);
     //post api method
-    Task<ComicDto> AddAsync(Comic comic);
+    Task<ComicDto> AddAsync(PostComicDto comicDto, int[] categoryIds, int artistId);
     //put api methods
-    Task UpdateAsync(Comic comic);
+    Task<ComicDto> UpdateAsync(PostComicDto comicDto, int id);
     Task<bool> UpdateComicCategoryAsync(int id, int[] categoryId);
     Task<bool> UpdateComicArtistAsync(int id, int[] artistId);
     //remove, store api methods

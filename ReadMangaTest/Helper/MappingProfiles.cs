@@ -10,6 +10,10 @@ public class MappingProfiles: Profile
     {
         CreateMap<Comic, ComicDto>();
         CreateMap<ComicDto, Comic>();
+        CreateMap<ComicDto, PostComicDto>();
+        CreateMap<Comic, PostComicDto>();
+        CreateMap<PostComicDto, ComicDto>();
+        CreateMap<PostComicDto, Comic>();
         CreateMap<Category, CategoryDto>();
         CreateMap<CategoryDto, Category>();
     }

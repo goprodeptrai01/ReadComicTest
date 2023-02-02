@@ -8,7 +8,7 @@ using ReadMangaTest.Models;
 
 namespace ReadMangaTest.Repositories;
 
-public class ComicRepository: IComicRepository
+public class ComicRepository : IComicRepository
 {
     private readonly DataContext _context;
     private readonly IMapper _mapper;
@@ -33,7 +33,6 @@ public class ComicRepository: IComicRepository
                 Wallpaper = c.Wallpaper,
                 Artist = c.Artist.Name,
                 Categories = c.ComicCategories
-                    .Where(cc => cc.IsHidden == false)
                     .Select(cc => cc.Category.Name)
                     .ToList()
             }).ToListAsync();
@@ -47,18 +46,18 @@ public class ComicRepository: IComicRepository
     public async Task<Comic> GetByNameAsync(string name)
     {
         return await _context.Comics.Where(c => c.IsHidden == false && c.Name == name).FirstOrDefaultAsync();
-
     }
 
     public async Task<IEnumerable<Comic>> GetByCategoryAsync(int categoryId)
     {
-        return await _context.Comics.Where(c => c.IsHidden == false && c.ComicCategories.Any(cc => cc.CategoryId == categoryId))
+        return await _context.Comics
+            .Where(c => c.IsHidden == false && c.ComicCategories.Any(cc => cc.CategoryId == categoryId))
             .ToListAsync();
     }
 
     public async Task<IEnumerable<Comic>> GetByArtistIdAsync(int artistId)
     {
-        return await _context.Comics.Where(c => c.Artist.Id == artistId && c.IsHidden == false).ToListAsync(); 
+        return await _context.Comics.Where(c => c.Artist.Id == artistId && c.IsHidden == false).ToListAsync();
     }
 
     public bool IsExists(int id)
@@ -71,36 +70,70 @@ public class ComicRepository: IComicRepository
         return _context.Comics.Any(x => x.IsHidden == false && x.Name == name);
     }
 
-    public async Task<ComicDto> AddAsync(Comic comic)
+    public async Task<ComicDto> AddAsync(PostComicDto comicDto, int[] categoryIds, int artistId)
     {
-        
-        await _context.Comics.AddAsync(comic);
-        await _context.SaveChangesAsync();
-        return _mapper.Map<ComicDto>(comic);
-    }
-
-    public async Task AddArtistToComic(int artistId, Comic comic)
-    {
-        
-        var artist = await _context.Artists.FirstOrDefaultAsync(a => a.Id == artistId);
-        if (artist == null)
+        try
         {
-            return;
+            var categories = _context.Categories.Count(c => categoryIds.Contains(c.Id) && !c.IsHidden);
+            if (categories != categoryIds.Length)
+            {
+                throw new Exception("one or more categories Not found");
+            }
+
+            var artist = await _context.Artists.Where(a => a.Id == artistId && !a.IsHidden).FirstOrDefaultAsync();
+            if (artist == null)
+            {
+                throw new Exception("Artist Not Found");
+            }
+
+            var comic = _mapper.Map<Comic>(comicDto);
+            comic.Artist = artist;
+            await _context.Comics.AddAsync(comic);
+            await _context.SaveChangesAsync();
+
+
+            var comicCategories = new List<ComicCategory>();
+            foreach (var categoryId in categoryIds)
+            {
+                var comicCategory = new ComicCategory
+                {
+                    ComicId = comic.Id,
+                    CategoryId = categoryId,
+                };
+                comicCategories.Add(comicCategory);
+            }
+
+            _context.ComicCategories.AddRange(comicCategories);
+            await _context.SaveChangesAsync();
+            return _mapper.Map<ComicDto>(comicDto);
         }
-
-        var newArtist = new Comic()
+        catch (Exception e)
         {
-            Artist = artist,
-        };
-        _context.Add(newArtist);
-        _context.Add(comic);
-        // await _context.SaveChangesAsync();
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    public async Task UpdateAsync(Comic comic)
+    public async Task<ComicDto> UpdateAsync(PostComicDto comicDto, int comicId)
     {
-        _context.Comics.Update(comic);
-        await _context.SaveChangesAsync();
+        try
+        {
+            var comic = await _context.Comics.Where(c => c.Id == comicId && !c.IsHidden).FirstOrDefaultAsync();
+            if (comic == null)
+            {
+                throw new Exception("Comic not found");
+            }
+            
+            _mapper.Map(comicDto, comic);
+            _context.Comics.Update(comic);
+            await _context.SaveChangesAsync();
+            return _mapper.Map<ComicDto>(comicDto);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception(e.Message);
+        }
     }
 
     public Task<bool> UpdateComicCategoryAsync(int id, int[] categoryId)

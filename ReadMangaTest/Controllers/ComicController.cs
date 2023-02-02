@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ReadMangaTest.Data;
 using ReadMangaTest.DTO;
@@ -97,26 +96,30 @@ public class ComicController : ControllerBase
         return Ok(comics);
     }
 
-    [HttpPost("{artistId}")]
-    [ProducesResponseType(201, Type = typeof(Comic))]
+    [HttpPost("{categoryIds}&{artistId}")]
+    [ProducesResponseType(204)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> PostComic([FromBody] ComicDto comicDto, [FromRoute] int artistId)
+    public async Task<IActionResult> PostComic([FromBody] PostComicDto comicDto, [FromRoute] string categoryIds, [FromRoute] int artistId)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
+        if (comicDto == null)
+            return BadRequest("Null");
+
+        if (_comicRepository.IsExists(comicDto.Name))
+        {
+            ModelState.AddModelError("Name", "Comic already exists");
+            return StatusCode(422, ModelState);
+        }
+
         try
         {
-            var comic = _mapper.Map<Comic>(comicDto);
-
-            comic.Artist = await _artistRepository.GetByIdAsync(artistId);
-            _context.Comics.Add(comic);
-            // await _comicRepository.AddArtistToComic(artistId, comic);
-            await _context.SaveChangesAsync();
-
-            return Ok(comic);
+            var categoryIdArray = categoryIds.Split(',').Select(int.Parse).ToArray();
+            await _comicRepository.AddAsync(comicDto, categoryIdArray, artistId);
+            return Ok(comicDto);
         }
         catch (Exception e)
         {
@@ -124,96 +127,34 @@ public class ComicController : ControllerBase
         }
     }
 
-    // [HttpPost("{comicId}/Category")]
-    // [ProducesResponseType(201, Type = typeof(Comic))]
-    // [ProducesResponseType(400)]
-    // public async Task<IActionResult> AddCategoryToComic([FromRoute] int comicId, [FromBody] CategoryDto categoryDto)
-    // {
-    //     if (!ModelState.IsValid)
-    //     {
-    //         return BadRequest(ModelState);
-    //     }
-    //
-    //     // var category = _mapper.Map<Category>(categoryDto);
-    //     try
-    //     {
-    //         var category = _mapper.Map<Category>(categoryDto);
-    //         var comic = await _context.Comics.FindAsync(comicId);
-    //         if (comic == null)
-    //         {
-    //             return NotFound();
-    //         }
-    //
-    //         var comicCategory = new ComicCategory()
-    //         {
-    //             ComicId = comicId,
-    //             Comic = comic,
-    //             CategoryId = category.Id,
-    //             Category = category
-    //         };
-    //         comic.comicCategories.Add(comicCategory);
-    //         category.comicCategories.Add(comicCategory);
-    //         await _context.SaveChangesAsync();
-    //
-    //         return Ok();
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         return StatusCode(500, "Internal Server Error" + e.Message);
-    //     }
-    // }
-    //
-    // [HttpPost("{comicId}/Artist")]
-    // [ProducesResponseType(201, Type = typeof(Comic))]
-    // [ProducesResponseType(400)]
-    // public async Task<IActionResult> AddArtistToComic([FromRoute] int comicId, [FromBody] ArtistDto artistDto)
-    // {
-    //     if (!ModelState.IsValid)
-    //     {
-    //         return BadRequest(ModelState);
-    //     }
-    //
-    //     try
-    //     {
-    //         var artist = _mapper.Map<Artist>(artistDto);
-    //         var comic = await _context.Comics.FindAsync(comicId);
-    //         if (comic == null)
-    //         {
-    //             return NotFound();
-    //         }
-    //
-    //         comic.Artist = artist;
-    //         // await _context.SaveChangesAsync();
-    //         artist.Comics.Add(comic);
-    //         await _context.SaveChangesAsync();
-    //         return Ok();
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         return StatusCode(500, "Internal Server Error" + e.Message);
-    //     }
-    // }
-
     [HttpPut("{comicId}")]
     [ProducesResponseType(200, Type = typeof(Comic))]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> PutComic([FromRoute] int comicId, [FromBody] ComicDto comicDto)
+    public async Task<IActionResult> PutComic([FromRoute] int comicId, [FromBody] PostComicDto comicDto)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
+        if (comicId == null)
+        {
+            return BadRequest("Null");
+        }
+        
+        if (comicId!= comicDto.Id)
+            return BadRequest("Invalid comic id");
+
+        if (_comicRepository.IsExists(comicDto.Name))
+        {
+            ModelState.AddModelError("Name", "Comic already exists");
+            return StatusCode(422, ModelState);
+        }
+        
         try
         {
-            var comic = await _comicRepository.GetByIdAsync(comicId);
-            if (comic == null)
-            {
-                return NotFound();
-            }
-            _mapper.Map(comicDto, comic);
-            await _comicRepository.UpdateAsync(comic);
-            return Ok(comic);
+            await _comicRepository.UpdateAsync(comicDto, comicId);
+            return Ok(comicDto);
         }
         catch (Exception e)
         {
