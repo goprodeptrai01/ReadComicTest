@@ -16,5 +16,11 @@ public class MappingProfiles: Profile
         CreateMap<PostComicDto, Comic>();
         CreateMap<Category, CategoryDto>();
         CreateMap<CategoryDto, Category>();
+        CreateMap<Artist, ArtistDto>();
+        CreateMap<Artist, PostArtistDto>();
+        CreateMap<ArtistDto, Artist>();
+        CreateMap<ArtistDto, PostArtistDto>();
+        CreateMap<PostArtistDto, ArtistDto>();
+        CreateMap<PostArtistDto, Artist>();
     }
 }

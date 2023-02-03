@@ -97,7 +97,7 @@ public class ComicController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetComicByArtistAsync(int artistId)
     {
-        if (!_categoryRepository.IsExists(artistId))
+        if (!_artistRepository.IsExists(artistId))
             return NotFound();
 
         var comics = await _comicRepository.GetByArtistIdAsync(artistId);
@@ -121,7 +121,7 @@ public class ComicController : ControllerBase
         if (comicDto == null)
             return BadRequest("Null");
 
-        if (_comicRepository.IsExists(comicDto.Name))
+        if (_comicRepository.IsExists(comicDto.Name, comicDto.Id))
         {
             ModelState.AddModelError("Name", "Comic already exists");
             return StatusCode(422, ModelState);
@@ -140,7 +140,7 @@ public class ComicController : ControllerBase
     }
 
     [HttpPut("{comicId}")]
-    [ProducesResponseType(200, Type = typeof(Comic))]
+    [ProducesResponseType(200, Type = typeof(ComicDto))]
     [ProducesResponseType(400)]
     public async Task<IActionResult> PutComicAsync([FromRoute] int comicId, [FromBody] PostComicDto comicDto)
     {
@@ -157,7 +157,7 @@ public class ComicController : ControllerBase
         if (comicId!= comicDto.Id)
             return BadRequest("Invalid comic id");
 
-        if (_comicRepository.IsExists(comicDto.Name))
+        if (_comicRepository.IsExists(comicDto.Name, comicId))
         {
             ModelState.AddModelError("Name", "Comic already exists");
             return StatusCode(422, ModelState);
@@ -221,7 +221,7 @@ public class ComicController : ControllerBase
     [HttpPut("{comicId}/store")]
     [ProducesResponseType(204)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> ArchiveAsync([FromRoute] int comicId)
+    public async Task<IActionResult> StoreAsync([FromRoute] int comicId)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);

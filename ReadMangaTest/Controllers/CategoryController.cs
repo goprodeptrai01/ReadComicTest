@@ -7,7 +7,7 @@ using ReadMangaTest.Models;
 
 namespace ReadMangaTest.Controllers;
 
-[Route("api/[controller]")]
+[Route("v1/api/category")]
 [ApiController]
 public class CategoryController : ControllerBase
 {
@@ -28,45 +28,43 @@ public class CategoryController : ControllerBase
         _context = context;
         _mapper = mapper;
     }
-    
+
     [HttpGet]
     [ProducesResponseType(200, Type = typeof(IEnumerable<Category>))]
-    public async Task<IActionResult> GetCategories()
+    public async Task<IActionResult> GetCategoriesAsync()
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
         try
         {
             var categories = await _categoryRepository.GetAllAsync();
 
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             return Ok(categories);
-
         }
         catch (Exception e)
         {
             return StatusCode(500, "Internal Server Error" + e.Message);
         }
-
     }
-    
+
     [HttpGet("{id}")]
     [ProducesResponseType(200, Type = typeof(Category))]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> GetCategory(int id)
+    public async Task<IActionResult> GetCategoryAsync(int id)
     {
-        // if (!_characterRepository.AnyCharacterExists(id))
-        //     return NotFound();
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (!_categoryRepository.IsExists(id))
+            return NotFound();
         try
         {
             var category = await _categoryRepository.GetByIdAsync(id);
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
 
             return Ok(category);
         }
@@ -75,15 +73,23 @@ public class CategoryController : ControllerBase
             return StatusCode(500, "Internal Server Error" + e.Message);
         }
     }
-    
+
     [HttpPost]
     [ProducesResponseType(201, Type = typeof(Category))]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> PostComic([FromBody] CategoryDto categoryDto)
+    public async Task<IActionResult> PostCategoryAsync([FromBody] CategoryDto categoryDto)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
+        }
+
+        if (categoryDto == null) return BadRequest("Null");
+
+        if (_categoryRepository.IsExists(categoryDto.Name, categoryDto.Id))
+        {
+            ModelState.AddModelError("Name", "Category already exists");
+            return StatusCode(422, ModelState);
         }
 
         try
@@ -94,6 +100,83 @@ public class CategoryController : ControllerBase
             await _context.SaveChangesAsync();
 
             return Ok(category);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal Server Error " + e);
+        }
+    }
+
+    [HttpPut("{id}")]
+    [ProducesResponseType(200, Type = typeof(CategoryDto))]
+    [ProducesResponseType(400)]
+    public async Task<IActionResult> PutCategoryAsync([FromRoute] int id, [FromBody] CategoryDto categoryDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (id == null)
+        {
+            return BadRequest("Null");
+        }
+        
+        if (id != categoryDto.Id)
+            return BadRequest("Invalid id");
+
+        if (_categoryRepository.IsExists(categoryDto.Name, id))
+        {
+            ModelState.AddModelError("Name", "Category already exists");
+            return StatusCode(422, ModelState);
+        }
+
+        try
+        {
+            await _categoryRepository.UpdateAsync(categoryDto, id);
+            return Ok(categoryDto);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, "Internal Server Error " + e);
+        }
+    }
+
+    [HttpPut("{id}/store")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    public async Task<IActionResult> StoreAsync([FromRoute] int id)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            await _categoryRepository.StoreAsync(id);
+            return Ok("Stored!");
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal Server Error " + e);
+        }
+    }
+    [HttpDelete("{id}/store")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    public async Task<IActionResult> DeleteAsync([FromRoute] int id)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            await _categoryRepository.DeleteAsync(id);
+            return Ok("Stored!");
         }
         catch (Exception e)
         {
