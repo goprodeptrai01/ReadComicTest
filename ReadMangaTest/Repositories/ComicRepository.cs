@@ -46,7 +46,7 @@ public class ComicRepository : IComicRepository
 
     public async Task<ComicDto> GetByIdAsync(int id)
     {
-        var comic = await _context.Comics.Where(c => c.IsHidden == false && c.Id == id)
+        var data = await _context.Comics.Where(c => c.IsHidden == false && c.Id == id)
             .Include(c => c.ComicCategories)
             .ThenInclude(cc => cc.Category)
             .Include(c => c.Artist)
@@ -62,11 +62,11 @@ public class ComicRepository : IComicRepository
                     .ToList()
             })
             .FirstOrDefaultAsync();
-        if (comic == null)
+        if (data == null)
         {
             return null;
         }   
-        return _mapper.Map<ComicDto>(comic);
+        return _mapper.Map<ComicDto>(data);
     }
 
     public async Task<ComicDto> GetByNameAsync(string name)

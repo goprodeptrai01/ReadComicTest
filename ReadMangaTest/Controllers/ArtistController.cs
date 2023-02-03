@@ -98,7 +98,7 @@ public class ArtistController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> PutArtistAsync([FromBody] ArtistDto artistDto, [FromRoute] int id)
+    public async Task<IActionResult> PutArtistAsync([FromBody] PostArtistDto portArtistDto, [FromRoute] int id)
     {
         if (!ModelState.IsValid)
         {
@@ -110,12 +110,12 @@ public class ArtistController : ControllerBase
             return BadRequest("Null");
         }
 
-        if (id != artistDto.Id)
+        if (id != portArtistDto.Id)
         {
             return BadRequest("Invalid artist id");
         }
 
-        if (_artistRepository.IsExists(artistDto.Name, id))
+        if (_artistRepository.IsExists(portArtistDto.Name, id))
         {
             ModelState.AddModelError("Name", "Artist already exists");
             return StatusCode(422, ModelState);
@@ -123,6 +123,7 @@ public class ArtistController : ControllerBase
 
         try
         {
+            var artistDto = _mapper.Map<ArtistDto>(portArtistDto);
             await  _artistRepository.UpdateAsync(artistDto, id);
             return Ok(artistDto);
         }

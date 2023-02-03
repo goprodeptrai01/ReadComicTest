@@ -97,7 +97,7 @@ public class ComicController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetComicByArtistAsync(int artistId)
     {
-        if (!_categoryRepository.IsExists(artistId))
+        if (!_artistRepository.IsExists(artistId))
             return NotFound();
 
         var comics = await _comicRepository.GetByArtistIdAsync(artistId);
