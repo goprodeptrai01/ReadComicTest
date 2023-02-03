@@ -140,9 +140,9 @@ public class ComicRepository : IComicRepository
         return _context.Comics.Any(x => x.IsHidden == false && x.Id == id);
     }
 
-    public bool IsExists(string name)
+    public bool IsExists(string name,int id)
     {
-        return _context.Comics.Any(x => x.IsHidden == false && x.Name == name);
+        return _context.Comics.Any(x => x.Id != id && x.Name == name);
     }
 
     public async Task<ComicDto> AddAsync(PostComicDto comicDto, int[] categoryIds, int artistId)
@@ -185,7 +185,7 @@ public class ComicRepository : IComicRepository
         catch (Exception e)
         {
             Console.WriteLine(e);
-            throw;
+            throw new Exception(e.Message);
         }
     }
 
