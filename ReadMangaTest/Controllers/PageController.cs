@@ -6,19 +6,20 @@ using ReadMangaTest.Interfaces;
 
 namespace ReadMangaTest.Controllers;
 
-[Route("v1/api/chapter")]
+[Route("v1/api/page")]
 [ApiController]
-public class ChapterController : ControllerBase
+public class PageController :  ControllerBase
 {
     private readonly IArtistRepository _artistRepository;
     private readonly IComicRepository _comicRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IChapterRepository _chapterRepository;
+    private readonly IPageRepository _pageRepository;
     private readonly DataContext _context;
     private readonly IMapper _mapper;
     private readonly IUriService _uriService;
 
-    public ChapterController(IArtistRepository artistRepository, IComicRepository comicRepository, ICategoryRepository categoryRepository, IChapterRepository chapterRepository, DataContext context, IMapper mapper, IUriService uriService)
+    public PageController(IArtistRepository artistRepository, IComicRepository comicRepository, ICategoryRepository categoryRepository, IChapterRepository chapterRepository, DataContext context, IMapper mapper, IUriService uriService)
     {
         _artistRepository = artistRepository;
         _comicRepository = comicRepository;
@@ -29,20 +30,19 @@ public class ChapterController : ControllerBase
         _uriService = uriService;
     }
     
-    
     [HttpGet]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> GetChaptersAsync()
+    public async Task<IActionResult> GetPagesAsync()
     {
         try
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             
-            var chapters = await _chapterRepository.GetAllAsync();
+            var pages = await _pageRepository.GetAllAsync();
 
-            return Ok(chapters);
+            return Ok(pages);
         }
         catch (Exception e)
         {
@@ -54,58 +54,58 @@ public class ChapterController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> GetChapterAsync(int id)
+    public async Task<IActionResult> GetPageAsync(int id)
     {
-        if (!_chapterRepository.IsExists(id))
+        if (!_pageRepository.IsExists(id))
             return NotFound();
 
-        var chapter = await _chapterRepository.GetByIdAsync(id);
+        var pageDto = await _pageRepository.GetByIdAsync(id);
 
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        return Ok(chapter);
+        return Ok(pageDto);
     }
     
-    [HttpGet("{comicId}/comic")]
+    [HttpGet("{chapterId}/chapter")]
     [ProducesResponseType(200)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> GetChaptersByComicAsync(int comicId)
+    public async Task<IActionResult> GetPagesByChapterAsync(int chapterId)
     {
-        if (!_chapterRepository.IsExists(comicId))
+        if (!_pageRepository.IsExists(chapterId))
             return NotFound();
 
-        var chapters = await _chapterRepository.GetChaptersByComicAsync(comicId);
+        var pageDtos = await _pageRepository.GetPagesbyChapterAsync(chapterId);
 
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        return Ok(chapters);
+        return Ok(pageDtos);
     }
 
-    [HttpPost("{comicId}")]
+    [HttpPost("{chapterId}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> PostComicAsync([FromBody] ChapterDto chapterDto, [FromRoute] int comicId)
+    public async Task<IActionResult> PostComicAsync([FromBody] PageDto pageDto, [FromRoute] int chapterId)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        if (chapterDto == null)
+        if (pageDto == null)
             return BadRequest("Null");
 
-        if (_chapterRepository.IsExists(chapterDto.Name, chapterDto.Id))
+        if (_pageRepository.IsExists(pageDto.Name, pageDto.Id))
         {
-            ModelState.AddModelError("Name", "Chapter already exists");
+            ModelState.AddModelError("Name", "Page already exists");
             return StatusCode(422, ModelState);
         }
 
         try
         {
-            await _chapterRepository.AddAsync(chapterDto, comicId);
-            return Ok(chapterDto);
+            await _pageRepository.AddAsync(pageDto, chapterId);
+            return Ok(pageDto);
         }
         catch (Exception e)
         {
@@ -116,31 +116,31 @@ public class ChapterController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> PutComicAsync([FromRoute] int id, [FromBody] ChapterDto chapterDto)
+    public async Task<IActionResult> PutComicAsync([FromRoute] int id, [FromBody] PageDto pageDto)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        if (chapterDto == null)
+        if (pageDto == null)
         {
             return BadRequest("Null");
         }
         
-        if (id!= chapterDto.Id)
-            return BadRequest("Invalid chapter id");
+        if (id!= pageDto.Id)
+            return BadRequest("Invalid page id");
 
-        if (_chapterRepository.IsAvailable(chapterDto.Name, id))
+        if (_pageRepository.IsAvailable(pageDto.Name, id))
         {
-            ModelState.AddModelError("Name", "Chapter already exists");
+            ModelState.AddModelError("Name", "Page already exists");
             return StatusCode(422, ModelState);
         }
         
         try
         {
-            await _chapterRepository.UpdateAsync(chapterDto, id);
-            return Ok(chapterDto);
+            await _pageRepository.UpdateAsync(pageDto, id);
+            return Ok(pageDto);
         }
         catch (Exception e)
         {
@@ -158,7 +158,7 @@ public class ChapterController : ControllerBase
 
         try
         {
-            await _chapterRepository.StoreAsync(id);
+            await _pageRepository.StoreAsync(id);
             return Ok("Stored!");
         }
         catch (Exception e)
@@ -179,7 +179,7 @@ public class ChapterController : ControllerBase
         {
             var idArray = ids.Split(',').Select(int.Parse).ToArray();
             
-            await _chapterRepository.MultiStoreAsync(idArray);
+            await _pageRepository.MultiStoreAsync(idArray);
             return Ok("Stored!");
         }
         catch (Exception e)
@@ -198,7 +198,7 @@ public class ChapterController : ControllerBase
 
         try
         {
-            await _chapterRepository.DeleteAsync(id);
+            await _pageRepository.DeleteAsync(id);
             return Ok("Deleted!");
         }
         catch (Exception e)
@@ -219,7 +219,7 @@ public class ChapterController : ControllerBase
         {
             var idArray = ids.Split(',').Select(int.Parse).ToArray();
             
-            await _chapterRepository.MultiDeleteAsync(idArray);
+            await _pageRepository.MultiDeleteAsync(idArray);
             return Ok("Deleted!");
         }
         catch (Exception e)

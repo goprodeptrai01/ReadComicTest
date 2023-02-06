@@ -12,6 +12,7 @@ public class Comic
     public string Name { get; set; }
     public string Description { get; set; }
     public string Wallpaper { get; set; }
+    public string url { get; set; }
     public Artist Artist { get; set; }
     public bool IsHidden { get; set; } = false;
     public virtual ICollection<Chapter> Chapters { get; set; }

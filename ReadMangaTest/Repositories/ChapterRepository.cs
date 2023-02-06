@@ -27,7 +27,7 @@ public class ChapterRepository : IChapterRepository
             {
                 Id = c.Id,
                 Name = c.Name,
-                Content = c.Content,
+                Url = c.Url,
                 Comic = c.Comic.Name,
             }).ToListAsync();
         return data;
@@ -42,7 +42,7 @@ public class ChapterRepository : IChapterRepository
             {
                 Id = c.Id,
                 Name = c.Name,
-                Content = c.Content,
+                Url = c.Url,
                 Comic = c.Comic.Name,
             }).FirstOrDefaultAsync();
         if (data == null)
@@ -59,7 +59,7 @@ public class ChapterRepository : IChapterRepository
             {
                 Id = c.Id,
                 Name = c.Name,
-                Content = c.Content,
+                Url = c.Url,
                 Comic = c.Comic.Name,
             }).ToListAsync();
     }
@@ -176,6 +176,19 @@ public class ChapterRepository : IChapterRepository
             if (chapter == null)
                 throw new Exception("Chapter not found");
             _context.Chapters.Remove(chapter);
+            
+            var pages = await _context.Pages.Where(c => c.Chapter == chapter).ToListAsync();
+            if (pages != null)
+            {
+                var chapterNull = await _context.Chapters.FindAsync(1);
+                if (chapterNull == null) throw new Exception("Chapter not found!");
+                foreach (var page in pages)
+                {
+                    page.Chapter = chapterNull;
+                    _context.Pages.Update(page);
+                }
+            }
+            
             await _context.SaveChangesAsync();
         }
         catch (Exception e)
@@ -197,6 +210,21 @@ public class ChapterRepository : IChapterRepository
 
             var chapters = await _context.Chapters.Where(c => id.Contains(c.Id)).ToListAsync();
             _context.Chapters.RemoveRange(chapters);
+
+            foreach (var chapter in chapters)
+            {
+                var pages = await _context.Pages.Where(c => c.Chapter == chapter).ToListAsync();
+                if (pages != null)
+                {
+                    var chapterNull = await _context.Chapters.FindAsync(1);
+                    if (chapterNull == null) throw new Exception("Chapter not found!");
+                    foreach (var page in pages)
+                    {
+                        page.Chapter = chapterNull;
+                        _context.Pages.Update(page);
+                    }
+                }
+            }
             await _context.SaveChangesAsync();
         }
         catch (Exception e)

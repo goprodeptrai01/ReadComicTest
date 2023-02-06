@@ -337,7 +337,19 @@ public class ComicRepository : IComicRepository
             if (comicCategories == null)
                 throw new Exception("Comic category not found!");
             _context.ComicCategories.RemoveRange(comicCategories);
-
+            
+            var chapters = await _context.Chapters.Where(c => c.Comic == comic).ToListAsync();
+            if (chapters != null)
+            {
+                var comicNull = await _context.Comics.FindAsync(1);
+                if (comicNull == null) throw new Exception("Comic not found!");
+                foreach (var chapter in chapters)
+                {
+                    chapter.Comic = comicNull;
+                    _context.Chapters.Update(chapter);
+                }
+            }
+            
             await _context.SaveChangesAsync();
         }
         catch (Exception e)
@@ -363,6 +375,21 @@ public class ComicRepository : IComicRepository
             if (comicCategories == null)
                 throw new Exception("Comic category not found!");
             _context.ComicCategories.RemoveRange(comicCategories);
+
+            foreach (var comic in comics)
+            {
+                var chapters = await _context.Chapters.Where(c => c.Comic == comic).ToListAsync();
+                if (chapters != null)
+                {
+                    var comicNull = await _context.Comics.FindAsync(1);
+                    if (comicNull == null) throw new Exception("Comic not found!");
+                    foreach (var chapter in chapters)
+                    {
+                        chapter.Comic = comicNull;
+                        _context.Chapters.Update(chapter);
+                    }
+                }
+            }
             
             await _context.SaveChangesAsync();
         }
