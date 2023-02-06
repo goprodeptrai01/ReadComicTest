@@ -46,7 +46,7 @@ public class ComicRepository : IComicRepository
 
     public async Task<ComicDto> GetByIdAsync(int id)
     {
-        var comic = await _context.Comics.Where(c => c.IsHidden == false && c.Id == id)
+        var data = await _context.Comics.Where(c => c.IsHidden == false && c.Id == id)
             .Include(c => c.ComicCategories)
             .ThenInclude(cc => cc.Category)
             .Include(c => c.Artist)
@@ -62,11 +62,11 @@ public class ComicRepository : IComicRepository
                     .ToList()
             })
             .FirstOrDefaultAsync();
-        if (comic == null)
+        if (data == null)
         {
             return null;
         }   
-        return _mapper.Map<ComicDto>(comic);
+        return _mapper.Map<ComicDto>(data);
     }
 
     public async Task<ComicDto> GetByNameAsync(string name)
@@ -140,9 +140,9 @@ public class ComicRepository : IComicRepository
         return _context.Comics.Any(x => x.IsHidden == false && x.Id == id);
     }
 
-    public bool IsExists(string name)
+    public bool IsExists(string name,int id)
     {
-        return _context.Comics.Any(x => x.IsHidden == false && x.Name == name);
+        return _context.Comics.Any(x => x.Id != id && x.Name == name);
     }
 
     public async Task<ComicDto> AddAsync(PostComicDto comicDto, int[] categoryIds, int artistId)
@@ -185,7 +185,7 @@ public class ComicRepository : IComicRepository
         catch (Exception e)
         {
             Console.WriteLine(e);
-            throw;
+            throw new Exception(e.Message);
         }
     }
 
@@ -337,7 +337,19 @@ public class ComicRepository : IComicRepository
             if (comicCategories == null)
                 throw new Exception("Comic category not found!");
             _context.ComicCategories.RemoveRange(comicCategories);
-
+            
+            var chapters = await _context.Chapters.Where(c => c.Comic == comic).ToListAsync();
+            if (chapters != null)
+            {
+                var comicNull = await _context.Comics.FindAsync(1);
+                if (comicNull == null) throw new Exception("Comic not found!");
+                foreach (var chapter in chapters)
+                {
+                    chapter.Comic = comicNull;
+                    _context.Chapters.Update(chapter);
+                }
+            }
+            
             await _context.SaveChangesAsync();
         }
         catch (Exception e)
@@ -363,6 +375,21 @@ public class ComicRepository : IComicRepository
             if (comicCategories == null)
                 throw new Exception("Comic category not found!");
             _context.ComicCategories.RemoveRange(comicCategories);
+
+            foreach (var comic in comics)
+            {
+                var chapters = await _context.Chapters.Where(c => c.Comic == comic).ToListAsync();
+                if (chapters != null)
+                {
+                    var comicNull = await _context.Comics.FindAsync(1);
+                    if (comicNull == null) throw new Exception("Comic not found!");
+                    foreach (var chapter in chapters)
+                    {
+                        chapter.Comic = comicNull;
+                        _context.Chapters.Update(chapter);
+                    }
+                }
+            }
             
             await _context.SaveChangesAsync();
         }

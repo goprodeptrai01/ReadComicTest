@@ -14,7 +14,7 @@ public interface IComicRepository
     Task<IEnumerable<ComicDto>> GetByArtistIdAsync(int artistId);
     //check methods
     bool IsExists(int id);
-    bool IsExists(string name);
+    bool IsExists(string name, int id);
     //post api method
     Task<ComicDto> AddAsync(PostComicDto comicDto, int[] categoryIds, int artistId);
     //put api methods

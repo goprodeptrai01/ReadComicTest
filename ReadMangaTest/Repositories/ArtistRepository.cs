@@ -1,57 +1,198 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using ReadMangaTest.Data;
+using ReadMangaTest.DTO;
 using ReadMangaTest.Interfaces;
 using ReadMangaTest.Models;
+using NotImplementedException = System.NotImplementedException;
 
 namespace ReadMangaTest.Repositories;
 
-public class ArtistRepository: IArtistRepository
+public class ArtistRepository : IArtistRepository
 {
     private readonly DataContext _context;
+    private readonly IMapper _mapper;
 
-    public ArtistRepository(DataContext context)
+    public ArtistRepository(DataContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
-    public async Task<IList<Artist>> GetAllAsync()
+
+    public async Task<List<ArtistDto>> GetAllAsync()
     {
-        return await _context.Artists.ToListAsync();
+        var data = await _context.Artists
+            .Where(a => !a.IsHidden)
+            .Include(a => a.Comics)
+            .Select(a => new ArtistDto
+            {
+                Id = a.Id,
+                Name = a.Name,
+                Description = a.Description,
+                Comics = a.Comics
+                    .Select(c => c.Name)
+                    .ToList(),
+            }).ToListAsync();
+        return data;
     }
 
-    public async Task<Artist> GetByIdAsync(int id)
+    public async Task<ArtistDto> GetByIdAsync(int id)
     {
-        return await _context.Artists.FindAsync(id);
+        try
+        {
+            var artist = await _context.Artists
+                .Where(a => a.Id == id && !a.IsHidden)
+                .Include(a => a.Comics)
+                .Select(a => new ArtistDto
+                {
+                    Id = a.Id,
+                    Name = a.Name,
+                    Description = a.Description,
+                    Comics = a.Comics
+                        .Select(c => c.Name)
+                        .ToList(),
+                }).FirstOrDefaultAsync();
+            if (artist == null)
+            {
+                return null;
+            }
+
+            return _mapper.Map<ArtistDto>(artist);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception(e.Message, e.InnerException);
+        }
     }
 
-    public async Task<Artist> GetByNameAsync(string name)
+    public async Task<ArtistDto> GetByNameAsync(string name)
     {
-        return await _context.Artists.FirstOrDefaultAsync(x => x.Name.Equals(name));
+        try
+        {
+            var artist = await _context.Artists
+                .Where(a => a.Name == name && !a.IsHidden)
+                .Include(a => a.Comics)
+                .Select(a => new ArtistDto
+                {
+                    Id = a.Id,
+                    Name = a.Name,
+                    Description = a.Description,
+                    Comics = a.Comics
+                        .Select(c => c.Name)
+                        .ToList(),
+                }).FirstOrDefaultAsync();
+            if (artist == null)
+            {
+                return null;
+            }
+
+            return _mapper.Map<ArtistDto>(artist);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception(e.Message, e.InnerException);
+        }
     }
 
-    public async Task AddAsync(Artist artist)
+    public bool IsExists(int id)
     {
-        await _context.Artists.AddAsync(artist);
+        return _context.Artists.Any(a => a.Id == id &&!a.IsHidden);
     }
 
-    public async Task UpdateAsync(Artist artist)
+    public bool IsExists(string name, int id)
     {
-        _context.Artists.Update(artist);
+        return _context.Artists.Any(a => a.Name == name && a.Id != id);
+    }
+
+    public async Task<ArtistDto> AddAsync(ArtistDto artistDto)
+    {
+        try
+        {
+            var artist = _mapper.Map<Artist>(artistDto);
+            await _context.Artists.AddAsync(artist);
+            await _context.SaveChangesAsync();
+            return _mapper.Map<ArtistDto>(artist);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception(e.Message, e.InnerException);
+        }
+    }
+
+    public async Task<ArtistDto> UpdateAsync(ArtistDto artistDto, int id)
+    {
+        try
+        {
+            var artist = await _context.Artists.FirstOrDefaultAsync(a => a.Id == id && !a.IsHidden);
+            if (artist == null)
+            {
+                throw new Exception("Artist not found");
+            }
+            
+            _mapper.Map(artistDto, artist);
+            _context.Artists.Update(artist);
+            await _context.SaveChangesAsync();
+            return _mapper.Map<ArtistDto>(artist);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception(e.Message, e.InnerException);
+        }
+    }
+
+    public async Task StoreAsync(int id)
+    {
+        try
+        {
+            var artist = await _context.Artists.FindAsync(id);
+            if (artist == null)
+                throw new Exception("Artist not found");
+            artist.IsHidden = !artist.IsHidden;
+            _context.Artists.Update(artist);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception(e.Message, e.InnerException);
+        }
     }
 
     public async Task DeleteAsync(int id)
     {
-        var artist = await _context.Artists.FindAsync(id);
-        _context.Artists.Remove(artist);
-    }
+        try
+        {
+            var artist = await _context.Artists.FindAsync(id);
+            if (artist == null)
+                throw new Exception("Artist not found");
+            _context.Artists.Remove(artist);
+            
+            var comics = await _context.Comics.Where(c => c.Artist == artist).ToListAsync();
+            if (comics!= null)
+            {
+                var artistNull = await _context.Artists.FindAsync(1);
+                if (artistNull == null)
+                {
+                    throw new Exception("Artist null not found");
+                }
+                foreach (var comic in comics)
+                {
+                    comic.Artist = artistNull;
+                    _context.Comics.Update(comic);
+                }   
+            }
 
-    public async Task<bool> IsArtistExistsAsync(int id)
-    {
-        return await _context.Artists.AnyAsync(x => x.Id == id);
-    }
-
-    public async Task<bool> IsArtistExistsAsync(string name)
-    {
-        return await _context.Artists.AnyAsync(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new Exception(e.Message, e.InnerException);
+        }
     }
 }

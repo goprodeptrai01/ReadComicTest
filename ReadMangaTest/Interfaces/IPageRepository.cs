@@ -3,20 +3,19 @@ using ReadMangaTest.Models;
 
 namespace ReadMangaTest.Interfaces;
 
-public interface IChapterRepository
+public interface IPageRepository
 {
-    //get api methods
-    Task<List<ChapterDto>> GetAllAsync();
-    Task<ChapterDto> GetByIdAsync(int id);
-    Task<List<ChapterDto>> GetChaptersByComicAsync(int comicId);
+    Task<List<PageDto>> GetAllAsync();
+    Task<PageDto> GetByIdAsync(int id);
+    Task<List<PageDto>> GetPagesbyChapterAsync(int chapterId);
     //check methods
     bool IsExists(int id);
     bool IsAvailable(string name, int id);
     bool IsExists(string name, int id);
     //post api method
-    Task<ChapterDto> AddAsync(ChapterDto chapterDto, int comicId);
+    Task<PageDto> AddAsync(PageDto pageDto, int chapterId);
     //put api methods
-    Task<ChapterDto> UpdateAsync(ChapterDto chapterDto, int id);
+    Task<PageDto> UpdateAsync(PageDto pageDto, int chapterId);
     //remove, store api methods
     Task StoreAsync(int id);
     Task MultiStoreAsync(int[] id);

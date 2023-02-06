@@ -13,6 +13,7 @@ public class DataContext: DbContext
     public DbSet<Chapter> Chapters { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Artist> Artists { get; set; }
+    public DbSet<Page> Pages { get; set; }
     public DbSet<ComicCategory> ComicCategories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
