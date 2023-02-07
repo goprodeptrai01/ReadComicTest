@@ -53,6 +53,10 @@
               "target": "Package",
               "version": "[12.0.0, )"
             },
+            "Faker.Net": {
+              "target": "Package",
+              "version": "[2.0.154, )"
+            },
             "HtmlAgilityPack": {
               "target": "Package",
               "version": "[1.11.46, )"
@@ -84,6 +88,10 @@
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.2, )"
+            },
+            "ScrapySharp": {
+              "target": "Package",
+              "version": "[3.0.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
