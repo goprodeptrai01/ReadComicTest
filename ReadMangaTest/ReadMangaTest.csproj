@@ -9,7 +9,9 @@
     <ItemGroup>
         <PackageReference Include="AutoMapper" Version="12.0.1" />
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+        <PackageReference Include="Faker.Net" Version="2.0.154" />
         <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.2" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.2">
@@ -23,6 +25,19 @@
         </PackageReference>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Client\angular.json" />
+      <_ContentIncludedByDefault Remove="Client\package-lock.json" />
+      <_ContentIncludedByDefault Remove="Client\package.json" />
+      <_ContentIncludedByDefault Remove="Client\tsconfig.app.json" />
+      <_ContentIncludedByDefault Remove="Client\tsconfig.json" />
+      <_ContentIncludedByDefault Remove="Client\tsconfig.spec.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Client\src\app\component\comics" />
     </ItemGroup>
 
 </Project>

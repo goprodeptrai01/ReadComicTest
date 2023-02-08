@@ -1,89 +1,193 @@
-﻿// using ReadMangaTest.Models;
-//
-// namespace ReadMangaTest.Data;
-//
-// public class Seed
-// {
-//     private readonly DataContext _context;
-//
-//     public Seed(DataContext context)
-//     {
-//         _context = context;
-//     }
-//
-//     public void SeedDataContext()
-//     {
-//         if (!_context.ComicCategories.Any())
-//         {
-//             var comicCategories = new List<ComicCategory>()
-//             {
-//                 new ComicCategory()
-//                 {
-//                     Comic = new Comic()
-//                     {
-//                         Name = "Comic 1",
-//                         Description = "DesComic 1",
-//                         Wallpaper = "WalComic 1",
-//                         Artist = new Artist()
-//                         {
-//                             Name = "Artist 1",
-//                             Description = "DesArtist 1",
-//                         },
-//                         Chapters = new List<Chapter>()
-//                         {
-//                             new Chapter()
-//                             {
-//                                 Name = "Chapter 1",
-//                                 Content = "Content 1 Comic 1",
-//                             },
-//                             new Chapter()
-//                             {
-//                                 Name = "Chapter 2",
-//                                 Content = "Content 2 Comic 1",
-//                             }
-//                         }
-//                     },
-//                     Category = new Category()
-//                     {
-//                         Name = "Category 1",
-//                         Description = "DesCategory 1"
-//                     }
-//                 },
-//                 new ComicCategory()
-//                 {
-//                     Comic = new Comic()
-//                     {
-//                         Name = "Comic 2",
-//                         Description = "DesComic 2",
-//                         Wallpaper = "WalComic 2",
-//                         Artist = new Artist()
-//                         {
-//                             Name = "Artist 2",
-//                             Description = "DesArtist 2",
-//                         },
-//                         Chapters = new List<Chapter>()
-//                         {
-//                             new Chapter()
-//                             {
-//                                 Name = "Chapter 1",
-//                                 Content = "Content 1 Comic 2",
-//                             },
-//                             new Chapter()
-//                             {
-//                                 Name = "Chapter 2",
-//                                 Content = "Content 2 Comic 2",
-//                             }
-//                         }
-//                     },
-//                     Category = new Category()
-//                     {
-//                         Name = "Category 2",
-//                         Description = "DesCategory 2"
-//                     }
-//                 }
-//             };
-//             // _context.ComicCategories.AddRange(comicCategories);
-//             // _context.SaveChanges();
-//         }
-//     }
-// }
+﻿using Faker;
+using ReadMangaTest.Models;
+
+namespace ReadMangaTest.Data;
+
+public class Seed
+{
+    private readonly DataContext _context;
+
+    public Seed(DataContext context)
+    {
+        _context = context;
+    }
+
+    public void SeedDataContext()
+    {
+        Console.WriteLine("Seeding");
+        if (_context.ComicCategories.Any())
+        {
+            Console.WriteLine("Creating");
+            var comicCategories = new List<ComicCategory>();
+            for (var i = 0; i < 777777; i++)
+            {
+                Console.WriteLine("Numb of data: "+i);
+                var comicCategory = new ComicCategory()
+                {
+                    Comic = new Comic()
+                    {
+                        Name = "Comic "+Name.FullName(),
+                        Description = Lorem.Sentence(),
+                        Wallpaper = Internet.DomainWord(),
+                        Url = Internet.Url(),
+                        Artist = new Artist()
+                        {
+                            Name = "Artist "+Name.FullName(),
+                            Description = Lorem.Sentence(),
+                            Url = Internet.Url(),
+                        },
+                        Chapters = new List<Chapter>()
+                        {
+                            new Chapter()
+                            {
+                                Name = "Chapter "+ Name.FullName(),
+                                Url = Internet.Url(),
+                                Pages = new List<Page>()
+                                {
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    }
+                                }
+                            },
+                            new Chapter()
+                            {
+                                Name = "Chapter "+Name.FullName(),
+                                Url = Internet.Url(),
+                                Pages = new List<Page>()
+                                {
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    },
+                                    new Page()
+                                    {
+                                        Name = "Page "+Name.FullName(),
+                                        Url = Internet.Url(),
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    Category = new Category()
+                    {
+                        Name = " Category " + Name.FullName(),
+                        Description = "DesCategory " + Lorem.Sentence(3),
+                        Url = Internet.Url(),
+                    }
+                };
+                comicCategories.Add(comicCategory);
+            };
+            _context.ComicCategories.AddRange(comicCategories);
+            _context.SaveChanges();
+        }
+        Console.WriteLine("Done!");
+    }
+}

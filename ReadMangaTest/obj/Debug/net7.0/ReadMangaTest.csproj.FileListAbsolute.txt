@@ -78,3 +78,12 @@ D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\AutoMapper.dll
 D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
 D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\HtmlAgilityPack.dll
 D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\Newtonsoft.Json.dll
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\Client\angular.json
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\Client\package-lock.json
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\Client\package.json
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\Client\tsconfig.app.json
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\Client\tsconfig.json
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\Client\tsconfig.spec.json
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\Faker.Net.6.0.dll
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\de-DE\Faker.Net.6.0.resources.dll
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
