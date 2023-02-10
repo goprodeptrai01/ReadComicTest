@@ -37,6 +37,10 @@ public class ComicController : ControllerBase
         _mapper = mapper;
     }
 
+    /// <summary>
+    /// Gets the list of all Comics.
+    /// </summary>
+    /// <returns>The list of Comics.</returns>
     [HttpGet]
     [Authorize(Roles = "Artist")]
     [ProducesResponseType(200)]

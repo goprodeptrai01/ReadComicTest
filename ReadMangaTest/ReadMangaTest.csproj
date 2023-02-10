@@ -6,6 +6,16 @@
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <DocumentationFile>bin\Debug\ReadMangaTest.xml</DocumentationFile>
+      <NoWarn>1701;1702;1591;IL2121</NoWarn>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <Optimize>false</Optimize>
+      <NoWarn>1701;1702;1591;IL2121</NoWarn>
+    </PropertyGroup>
+
     <ItemGroup>
       <Compile Remove="Client\**" />
       <Content Remove="Client\**" />
@@ -34,6 +44,9 @@
         <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
         <PackageReference Include="ScrapySharp" Version="3.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.5.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.5.0" />
         <PackageReference Include="System.Web.Http.Common" Version="4.0.20126.16343" />
     </ItemGroup>
 

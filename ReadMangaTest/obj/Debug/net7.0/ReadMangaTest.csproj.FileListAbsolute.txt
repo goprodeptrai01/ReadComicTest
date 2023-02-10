@@ -100,3 +100,4 @@ D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\de-DE\Faker.Net.6
 D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\DevOne.Security.Cryptography.BCrypt.dll
 D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\System.Web.Http.Common.dll
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\ReadMangaTest.xml

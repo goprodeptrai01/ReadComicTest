@@ -1,18 +1,17 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ReadMangaTest.Data;
 using ReadMangaTest.DTO;
 using ReadMangaTest.Interfaces;
 using ReadMangaTest.Models;
+
 
 
 namespace ReadMangaTest.Repositories;
@@ -155,18 +154,6 @@ public class AccountRepository : IAccountRepository
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-
-    public void setTokenCookie(string token)
-    {
-        var cookieOptions = new CookieOptions
-        {
-            HttpOnly = true,
-            Expires = DateTime.Now.AddMinutes(2)
-        };
-        // Response.Cookies.Append("refreshToken", token, cookieOptions);
-    }
-    
-
     
     public string GetCurrentToken()
     {
@@ -184,7 +171,7 @@ public class AccountRepository : IAccountRepository
             if (cookie != null)
             {
                 token = cookie;
-                // _httpContextAccessor.HttpContext?.Response.Cookies.Delete(_tokenOptions.Cookie.Name);
+                // _httpContextAccessor.HttpContext?.Response.Cookies.Delete();
             }
         }
         Console.WriteLine(token);

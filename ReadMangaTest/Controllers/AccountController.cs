@@ -63,12 +63,16 @@ public class AccountController : ControllerBase
 
         try
         {
-            // var token = "";
-            // if (await _accountRepository.LoginAsync(_mapper.Map<AccountDto>(accountDto)) != null)
-            // {
-            //     token = await _accountRepository.GenerateTokenAsync(await _accountRepository.LoginAsync(_mapper.Map<AccountDto>(accountDto)));
-            // }
-            var token = await _accountRepository.LoginAsync(_mapper.Map<AccountDto>(accountDto)) != null ? await _accountRepository.GenerateTokenAsync(await _accountRepository.LoginAsync(_mapper.Map<AccountDto>(accountDto))) : null;
+            var token = await _accountRepository.LoginAsync(_mapper.Map<AccountDto>(accountDto)) != null
+                ? await _accountRepository.GenerateTokenAsync(
+                    await _accountRepository.LoginAsync(_mapper.Map<AccountDto>(accountDto)))
+                : null;
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.Now.AddMinutes(2)
+            };
+            Response.Cookies.Append("refreshToken", token!, cookieOptions);
             return Ok(token);
         }
         catch (Exception e)
