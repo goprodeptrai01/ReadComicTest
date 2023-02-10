@@ -22,5 +22,11 @@ public class MappingProfiles: Profile
         CreateMap<ArtistDto, PostArtistDto>();
         CreateMap<PostArtistDto, ArtistDto>();
         CreateMap<PostArtistDto, Artist>();
+        CreateMap<Account, AccountDto>();
+        CreateMap<Account, LoginDto>();
+        CreateMap<AccountDto, LoginDto>();
+        CreateMap<AccountDto, Account>();
+        CreateMap<LoginDto, Account>();
+        CreateMap<LoginDto, AccountDto>();
     }
 }

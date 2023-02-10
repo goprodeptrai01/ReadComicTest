@@ -95,3 +95,8 @@ D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\ru\FSharp.Core.re
 D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\tr\FSharp.Core.resources.dll
 D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\zh-Hans\FSharp.Core.resources.dll
 D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\zh-Hant\FSharp.Core.resources.dll
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\Faker.Net.6.0.dll
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\de-DE\Faker.Net.6.0.resources.dll
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\DevOne.Security.Cryptography.BCrypt.dll
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\GO\Code\Csharp\ReadMangaTest\ReadMangaTest\bin\Debug\net7.0\System.Web.Http.Common.dll

@@ -75,6 +75,15 @@
           }
         }
       },
+      "BCrypt/1.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/DevOne.Security.Cryptography.BCrypt.dll": {}
+        },
+        "runtime": {
+          "lib/DevOne.Security.Cryptography.BCrypt.dll": {}
+        }
+      },
       "Faker.Net/2.0.154": {
         "type": "package",
         "dependencies": {
@@ -174,6 +183,25 @@
             "related": ".xml"
           }
         }
+      },
+      "Microsoft.AspNetCore.Authentication.JwtBearer/7.0.2": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.IdentityModel.Protocols.OpenIdConnect": "6.15.1"
+        },
+        "compile": {
+          "lib/net7.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net7.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll": {
+            "related": ".xml"
+          }
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
       },
       "Microsoft.AspNetCore.OpenApi/7.0.2": {
         "type": "package",
@@ -1377,6 +1405,19 @@
           "lib/netcoreapp2.1/_._": {}
         }
       },
+      "System.Web.Http.Common/4.0.20126.16343": {
+        "type": "package",
+        "compile": {
+          "lib/net40/System.Web.Http.Common.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net40/System.Web.Http.Common.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "System.Windows.Extensions/5.0.0": {
         "type": "package",
         "dependencies": {
@@ -1467,6 +1508,18 @@
         "azureicon.png",
         "lib/netstandard2.0/Azure.Identity.dll",
         "lib/netstandard2.0/Azure.Identity.xml"
+      ]
+    },
+    "BCrypt/1.0.0": {
+      "sha512": "/ibwe2Sg7MJR26IrEzW2Rde9/+A+AYXB5Kf9w/8BVLDdzSfUe4W2M7i2efy1Wa9wHh1k0y81Q6h9Ty8C6IrUGA==",
+      "type": "package",
+      "path": "bcrypt/1.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "bcrypt.1.0.0.nupkg.sha512",
+        "bcrypt.nuspec",
+        "lib/DevOne.Security.Cryptography.BCrypt.dll"
       ]
     },
     "Faker.Net/2.0.154": {
@@ -1612,6 +1665,21 @@
         "lib/netstandard2.0/Humanizer.dll",
         "lib/netstandard2.0/Humanizer.xml",
         "logo.png"
+      ]
+    },
+    "Microsoft.AspNetCore.Authentication.JwtBearer/7.0.2": {
+      "sha512": "sErKh1ZM3Ye1Lib8aWjexf1M5Ne0wptmR8Rr2p/7w1bXyi0kSHnYsVjdEsZGKHE12wNu+g3Zu6TLsKAVEyGYNw==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.authentication.jwtbearer/7.0.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net7.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll",
+        "lib/net7.0/Microsoft.AspNetCore.Authentication.JwtBearer.xml",
+        "microsoft.aspnetcore.authentication.jwtbearer.7.0.2.nupkg.sha512",
+        "microsoft.aspnetcore.authentication.jwtbearer.nuspec"
       ]
     },
     "Microsoft.AspNetCore.OpenApi/7.0.2": {
@@ -4367,6 +4435,19 @@
         "version.txt"
       ]
     },
+    "System.Web.Http.Common/4.0.20126.16343": {
+      "sha512": "3tybnaxSQAWu2aLSAh+7PRZ8Cw4f/DIECPJZ5yBcnm5sQKjr95zViCasYH3p6Z1hxATSTmlecvCcvlt/FDy+8w==",
+      "type": "package",
+      "path": "system.web.http.common/4.0.20126.16343",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net40/System.Web.Http.Common.dll",
+        "lib/net40/System.Web.Http.Common.xml",
+        "system.web.http.common.4.0.20126.16343.nupkg.sha512",
+        "system.web.http.common.nuspec"
+      ]
+    },
     "System.Windows.Extensions/5.0.0": {
       "sha512": "c1ho9WU9ZxMZawML+ssPKZfdnrg/OjR3pe0m9v8230z3acqphwvPJqzAkH54xRYm5ntZHGG1EPP3sux9H3qSPg==",
       "type": "package",
@@ -4394,8 +4475,10 @@
     "net7.0": [
       "AutoMapper >= 12.0.1",
       "AutoMapper.Extensions.Microsoft.DependencyInjection >= 12.0.0",
+      "BCrypt >= 1.0.0",
       "Faker.Net >= 2.0.154",
       "HtmlAgilityPack >= 1.11.46",
+      "Microsoft.AspNetCore.Authentication.JwtBearer >= 7.0.2",
       "Microsoft.AspNetCore.OpenApi >= 7.0.2",
       "Microsoft.EntityFrameworkCore >= 7.0.2",
       "Microsoft.EntityFrameworkCore.Design >= 7.0.2",
@@ -4403,7 +4486,8 @@
       "Microsoft.EntityFrameworkCore.Tools >= 7.0.2",
       "Newtonsoft.Json >= 13.0.2",
       "ScrapySharp >= 3.0.0",
-      "Swashbuckle.AspNetCore >= 6.4.0"
+      "Swashbuckle.AspNetCore >= 6.4.0",
+      "System.Web.Http.Common >= 4.0.20126.16343"
     ]
   },
   "packageFolders": {
@@ -4459,6 +4543,10 @@
             "target": "Package",
             "version": "[12.0.0, )"
           },
+          "BCrypt": {
+            "target": "Package",
+            "version": "[1.0.0, )"
+          },
           "Faker.Net": {
             "target": "Package",
             "version": "[2.0.154, )"
@@ -4466,6 +4554,10 @@
           "HtmlAgilityPack": {
             "target": "Package",
             "version": "[1.11.46, )"
+          },
+          "Microsoft.AspNetCore.Authentication.JwtBearer": {
+            "target": "Package",
+            "version": "[7.0.2, )"
           },
           "Microsoft.AspNetCore.OpenApi": {
             "target": "Package",
@@ -4502,6 +4594,10 @@
           "Swashbuckle.AspNetCore": {
             "target": "Package",
             "version": "[6.4.0, )"
+          },
+          "System.Web.Http.Common": {
+            "target": "Package",
+            "version": "[4.0.20126.16343, )"
           }
         },
         "imports": [
@@ -4526,5 +4622,27 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.102\\RuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'BCrypt 1.0.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net7.0'. This package may not be fully compatible with your project.",
+      "libraryId": "BCrypt",
+      "targetGraphs": [
+        "net7.0"
+      ]
+    },
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'System.Web.Http.Common 4.0.20126.16343' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net7.0'. This package may not be fully compatible with your project.",
+      "libraryId": "System.Web.Http.Common",
+      "targetGraphs": [
+        "net7.0"
+      ]
+    }
+  ]
 }

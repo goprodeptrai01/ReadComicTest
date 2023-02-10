@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReadMangaTest.Data;
@@ -18,27 +19,32 @@ public class ComicController : ControllerBase
     private readonly IComicRepository _comicRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IChapterRepository _chapterRepository;
+    private readonly IAccountRepository _accountRepository;
     private readonly DataContext _context;
     private readonly IMapper _mapper;
     private readonly IUriService _uriService;
 
     public ComicController(IComicRepository repository, IArtistRepository artistRepository, DataContext context,
-        IMapper mapper, ICategoryRepository categoryRepository, IChapterRepository chapterRepository, IUriService uriService)
+        IMapper mapper, ICategoryRepository categoryRepository, IChapterRepository chapterRepository, IUriService uriService, IAccountRepository accountRepository)
     {
         _comicRepository = repository;
         _artistRepository = artistRepository;
         _categoryRepository = categoryRepository;
         _chapterRepository = chapterRepository;
         _uriService = uriService;
+        _accountRepository = accountRepository;
         _context = context;
         _mapper = mapper;
     }
 
     [HttpGet]
+    [Authorize(Roles = "Artist")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     public async Task<IActionResult> GetComics([FromQuery] PaginationFilter filter)
     {
+        // _accountRepository.GetCurrentUserAsync();
+        
         try
         {
             if (!ModelState.IsValid)
