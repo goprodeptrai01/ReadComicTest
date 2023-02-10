@@ -1,6 +1,8 @@
 ﻿using HtmlAgilityPack;
 using ReadMangaTest.Data;
 using ReadMangaTest.Models;
+using ScrapySharp.Extensions;
+using ScrapySharp.Network;
 
 namespace ReadMangaTest.DataScrapping;
 
@@ -19,37 +21,67 @@ public class WebScrapping
         // Use HtmlWeb to download the HTML content of the web page
         var htmlWeb = new HtmlWeb();
         var htmlDocument = htmlWeb.Load(url);
-        
+
         // Use BeautifulSoup to parse the HTML content
         var htmlSoup = new HtmlAgilityPack.HtmlDocument();
         htmlSoup.LoadHtml(htmlDocument.DocumentNode.OuterHtml);
-        
+
         // Select the HTML nodes that contain the data you want to scrape
         return htmlSoup.DocumentNode.SelectNodes(xPath);
     }
+
     private HtmlNode GetHtmlNode(string url, string xPath)
     {
         // Use HtmlWeb to download the HTML content of the web page
         var htmlWeb = new HtmlWeb();
         var htmlDocument = htmlWeb.Load(url);
-        
+
         // Use BeautifulSoup to parse the HTML content
         var htmlSoup = new HtmlAgilityPack.HtmlDocument();
         htmlSoup.LoadHtml(htmlDocument.DocumentNode.OuterHtml);
-        
+
         // Select the HTML nodes that contain the data you want to scrape
         return htmlSoup.DocumentNode.SelectSingleNode(xPath);
     }
+    
+    private HtmlNodeCollection GetHtmlNodesByScrapySharp(string url)
+    {
+        try
+        {
+            ScrapingBrowser browser = new ScrapingBrowser();
+            WebPage htmlPage = browser.NavigateToPage(new Uri(url));
+            return htmlPage.Html.SelectNodes(".");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
+    }
 
+    private HtmlNode GetHtmlNodeByScrapySharp(string url)
+    {
+        try
+        {
+            ScrapingBrowser browser = new ScrapingBrowser();
+            WebPage htmlPage = browser.NavigateToPage(new Uri(url));
+            return htmlPage.Html;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
+    }
+
+    // public List<Category> ScrapeCategory()
     public List<Category> ScrapeCategory()
     {
-        
         // URL of the web page you want to scrape data from
-        var url = "https://www.nettruyenup.com";
+        var url = "https://kunmanga.com/manga-genre/action/";
+        var htmlPage = GetHtmlNodeByScrapySharp(url);
 
-        var categoryGrandNode = GetHtmlNode(url,"//body//nav[@id='mainNav']//li[@class='dropdown']");
-
-        var categoryNodes = categoryGrandNode.SelectNodes(".//ul[@class='nav']//li");
+        var categoryNodes = htmlPage.SelectNodes(".//li[@class='col-6 col-sm-4 col-md-2']");
         // Console.WriteLine(categoryNodes);
         var categories = new List<Category>();
         if (categoryNodes == null)
@@ -58,31 +90,20 @@ public class WebScrapping
             return null;
         }
 
-        
+
         foreach (var categoryNode in categoryNodes)
         {
-            var detailUrls = categoryNode.SelectSingleNode(".//a").Attributes["href"].Value;
-            
-            var descriptionCategory = GetHtmlNode(detailUrls, "//main[@class='main']//div[@class='container']//div[@id='ctl00_mainContent_ctl00_divDescription']//div").InnerHtml.Trim();        
-            var nameCategory = "";
-            if (categoryNode.SelectSingleNode(".//a//strong") is not null)
-            {
-                nameCategory = categoryNode.SelectSingleNode(".//a//strong").InnerText.Trim();
-            }
-            else
-            {
-                nameCategory = categoryNode.SelectSingleNode(".//a").InnerText.Trim();
-            }
+            var category = new Category();
+            var nameCategory = categoryNode.SelectSingleNode(".//a").InnerText.Trim().Split('\n').ToArray()[0];
+            category.Name = nameCategory;
+            var urlCategory = categoryNode.SelectSingleNode(".//a").Attributes["href"].Value;
+            category.Url = urlCategory;
+            category.Description = "";
 
-            var category = new Category()
-            {
-                Name = nameCategory,
-                Description = descriptionCategory
-            };
-            // Console.WriteLine(category.Name);
-            // Console.WriteLine(category.Description);
             categories.Add(category);
         }
+
+        // throw new Exception("Debug");
         return categories;
         // return;
         _context.Categories.AddRange(categories);
@@ -92,98 +113,232 @@ public class WebScrapping
 
     public void ScrapeComicAndArtist()
     {
+        var categoryList = ScrapeCategory();
+        var comics = new List<Comic>();
+        var artists = new List<Artist>();
+        var comicCategories = new List<ComicCategory>();
+        var chapters = new List<Chapter>();
+        var pages = new List<Page>();
+        var nullArtist = new Artist()
+        {
+            Name = "IsUpdating",
+            Description = "Is Updating!",
+            Url = "Is Updating!"
+        };
+        artists.Add(nullArtist);
         // URL of the web page you want to scrape data from
-        var url = "https://www.nettruyenup.com";
+        var url = "https://kunmanga.com/";
 
-        var comicNodes = GetHtmlNodes(url, 
-            "//main[@class='main']//div[@class='container']//div[@class='row']//div[@class='row']//div[@class='item']");
-        Console.WriteLine(1);
-        if (comicNodes == null)
+        var htmlPages = new List<HtmlNode>();
+
+        int countUrl = 1;
+
+        while (true)
+        {
+            string urlPage = url;
+            if (countUrl > 1)
+            {
+                urlPage += "page/" + countUrl;
+            }
+            
+            if (countUrl > 1)
+            {
+                break;
+            }
+            Console.WriteLine("Adding PageHtml: "+countUrl);
+            Console.WriteLine(urlPage);
+            
+            var htmlPage = GetHtmlNodeByScrapySharp(urlPage);
+            
+            if (htmlPage == null)
+            {
+                break;
+            }
+            htmlPages.Add(htmlPage);
+            countUrl++;
+        }
+
+        if (htmlPages == null)
         {
             Console.WriteLine("No data found on the web page");
             return;
         }
 
-        Console.WriteLine(2);
-        Console.WriteLine($"Found {comicNodes.Count} items on the web page");
+        Console.WriteLine("NumbOfPageHtml: " + htmlPages.Count);
 
-        // Loop through the selected HTML nodes and extract the data
-        Console.WriteLine(3);
-        var categoryList = ScrapeCategory();
-
-        
-        var comics = new List<Comic>();
-        var artists = new List<Artist>();
-        var categories = new List<Category>();
-        var comicCategories = new List<ComicCategory>();
-        var nullArtist = new Artist()
+        int countPage = 1;
+        foreach (var htmlPage in htmlPages)
         {
-            Name = "IsUpdating",
-            Description = "Is Updating!"
-        };
-        artists.Add(nullArtist);
-        int count = 4;
-        foreach (var comicNode in comicNodes)
-        {
-            Console.WriteLine(count);
-            count++;
-            string detailUrl = comicNode.SelectSingleNode(".//div//a").Attributes["href"].Value;
+            Console.WriteLine("Page: " + countPage);
+            countPage++;
+            var rowComicNodes = htmlPage.SelectNodes("//div[@class='page-listing-item']");
 
-            var detailComicNode = GetHtmlNode(detailUrl, 
-                "//main[@class='main']//div[@class='container']//div[@class='row']//div[@class='detail-info']//ul[@class='list-info']");
-
-            var nameArtist = detailComicNode.SelectSingleNode(".//li[@class='author row']//p[@class='col-xs-8']//a");
-            
-            var nameCategories = detailComicNode.SelectNodes(".//li[@class='kind row']//p[@class='col-xs-8']//a");
-
-            Artist artist;
-            if (nameArtist == null)
+            Console.WriteLine(1);
+            if (rowComicNodes == null)
             {
-                artist = nullArtist;
-            }
-            else
-            {
-                // Console.WriteLine(nameArtist.InnerHtml.Trim());
-
-                artist = new Artist()
-                {
-                    Name = nameArtist.InnerHtml.Trim(),
-                    Description = "",
-                };
+                Console.WriteLine("No data found on the web page");
+                return;
             }
 
-            var comic = new Comic()
-            {
-                Name = comicNode.SelectSingleNode(".//h3//a").InnerHtml.Trim(),
-                Description = comicNode.SelectSingleNode(".//div[@class='box_text']").InnerHtml.Trim(),
-                Wallpaper = comicNode.SelectSingleNode(".//a//img").Attributes["data-original"].Value,
-                Artist = artist
-            };
+            Console.WriteLine(2);
+            Console.WriteLine($"Found {rowComicNodes.Count} items on the web page");
+
+            // Loop through the selected HTML nodes and extract the data
+            Console.WriteLine(3);
             
-            foreach (var nameCategory in nameCategories)
+            int count = 4;
+
+            foreach (var rowComicNode in rowComicNodes)
             {
-                var categoryName = nameCategory.InnerHtml.Trim();
-                foreach (var category in categoryList)
+                var comicNodes = rowComicNode.SelectNodes("//div[@class='col-6 col-md-3 badge-pos-2']");
+                foreach (var comicNode in comicNodes)
                 {
-                    if (category.Name.Equals(categoryName))
+                    if (count > 5)
                     {
-                        var comicCategory = new ComicCategory()
-                        {
-                            Comic = comic,
-                            Category = category
-                        };
-                        comicCategories.Add(comicCategory);
+                        break;
+                    }
+                    Console.WriteLine(count);
+                    count++;
+                    string detailUrl = comicNode.SelectSingleNode(".//div//div//a").Attributes["href"].Value;
+
+                    var comicHtmlPage = GetHtmlNodeByScrapySharp(detailUrl);
+
+                    if (comicHtmlPage == null)
+                    {
+                        throw new Exception("Page not found!");
                     }
 
+                    var nameComic = comicNode
+                        .SelectSingleNode(".//div[@class='post-title font-title']//h3[@class='h5']//a")
+                        .InnerHtml.Trim();
+                    Console.WriteLine(nameComic);
+
+                    var comicDescriptionNode = comicHtmlPage
+                        ?.SelectSingleNode(".//div[@class='c-page-content style-1']")
+                        .SelectSingleNode(".//div[@class='description-summary']");
+
+                    var nameArtist = comicHtmlPage?.SelectSingleNode("//div[@class='author-content']//a");
+
+                    var nameCategories = comicHtmlPage?.SelectNodes(".//div[@class='genres-content']//a");
+
+                    var listChapterNode = comicHtmlPage?.SelectNodes("//li[@class='wp-manga-chapter    ']");
+
+                    Artist artist;
+                    if (nameArtist == null)
+                    {
+                        artist = nullArtist;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Adding artist: " + count);
+                        artist = new Artist()
+                        {
+                            Name = nameArtist.InnerHtml.Trim(),
+                            Url = nameArtist.Attributes["href"].Value,
+                            Description = "",
+                        };
+                    }
+
+                    Console.WriteLine("Adding comic: " + count);
+                    var comic = new Comic()
+                    {
+                        Name = nameComic,
+                        Description = comicDescriptionNode != null
+                            ? comicDescriptionNode.SelectSingleNode(".//div//div[@class='limit-html']") != null
+                                ? comicDescriptionNode.SelectSingleNode(".//div//div[@class='limit-html']")
+                                    .InnerHtml
+                                    .Trim()
+                                : comicDescriptionNode.SelectSingleNode(".//div//div[2]") != null
+                                    ? comicDescriptionNode.SelectSingleNode(".//div//div[2]").InnerHtml.Trim()
+                                    : comicDescriptionNode.SelectSingleNode(".//div//div") != null
+                                        ? comicDescriptionNode.SelectSingleNode(".//div//div").InnerHtml.Trim()
+                                        : comicDescriptionNode.SelectSingleNode(".//div//p[2]") != null
+                                            ? comicDescriptionNode.SelectSingleNode(".//div//p[2]").InnerHtml.Trim()
+                                            : comicDescriptionNode.SelectSingleNode(".//div//p").InnerHtml.Trim()
+                            : "",
+                        Url = comicNode.SelectSingleNode(".//div[@class='post-title font-title']//h3[@class='h5']//a")
+                            .Attributes["href"].Value,
+                        Wallpaper = comicNode.SelectSingleNode(".//div[@class='item-thumb  c-image-hover']//a//img")
+                            .Attributes["src"].Value,
+                        Artist = artist
+                    };
+                    if (listChapterNode == null)
+                    {
+                        Console.WriteLine("chapter not found");
+                        continue;
+                    }
+
+                    foreach (var chapterNode in listChapterNode)
+                    {
+                        var chapter = new Chapter()
+                        {
+                            Name = chapterNode.SelectSingleNode(".//a").InnerHtml.Trim(),
+                            Url = chapterNode.SelectSingleNode(".//a").Attributes["href"].Value,
+                            Comic = comic
+                        };
+                        Console.WriteLine("Adding chapter: " + chapter.Name);
+
+
+                        var chapterHtmlPage = GetHtmlNodeByScrapySharp(chapter.Url);
+
+                        var pageNodes = chapterHtmlPage.SelectNodes("//div[@class='page-break no-gaps']");
+                        if (pageNodes == null)
+                        {
+                            Console.WriteLine("pages not found");
+                            continue;
+                        }
+
+                        foreach (var pageNode in pageNodes)
+                        {
+                            var page = new Page()
+                            {
+                                Name = pageNode.SelectSingleNode(".//img").Attributes["id"].Value + "/" +
+                                       pageNodes.Count,
+                                Url = pageNode.SelectSingleNode(".//img").Attributes["src"].Value,
+                                Chapter = chapter
+                            };
+                            Console.WriteLine("Adding page: " + page.Name);
+                            pages.Add(page);
+                        }
+
+                        chapters.Add(chapter);
+                    }
+
+
+                    if (nameCategories == null)
+                    {
+                        Console.WriteLine("category not found");
+                        continue;
+                    }
+
+                    foreach (var nameCategory in nameCategories)
+                    {
+                        var categoryName = nameCategory.InnerHtml.Trim();
+                        foreach (var category in categoryList)
+                        {
+                            if (category.Name.Equals(categoryName))
+                            {
+                                var comicCategory = new ComicCategory()
+                                {
+                                    Comic = comic,
+                                    Category = category
+                                };
+                                comicCategories.Add(comicCategory);
+                            }
+                        }
+                    }
+
+
+                    // Console.WriteLine(comic.Name);
+                    // Console.WriteLine(comic.Artist.Name);
+                    artists.Add(artist);
+                    comics.Add(comic);
+                    Console.WriteLine("Done " + count);
                 }
             }
-
-
-            // Console.WriteLine(comic.Name);
-            // Console.WriteLine(comic.Artist.Name);
-            artists.Add(artist);
-            comics.Add(comic);
         }
+
+
         artists = artists.Distinct().ToList();
         // Console.WriteLine("\nManga: ");
         // foreach (var comic in comics)
@@ -210,13 +365,17 @@ public class WebScrapping
         //     Console.WriteLine("Category: "+comicCategory.CategoryId);
         // }
         // return;
+
         // Save the extracted data to the database
         _context.Artists.AddRange(artists);
         _context.Comics.AddRange(comics);
         _context.Categories.AddRange(categoryList);
+        _context.Chapters.AddRange(chapters);
+        _context.Pages.AddRange(pages);
         _context.ComicCategories.AddRange(comicCategories);
         _context.SaveChanges();
 
         Console.WriteLine("Data has been saved to the database successfully");
+        throw new Exception("Success!");
     }
 }

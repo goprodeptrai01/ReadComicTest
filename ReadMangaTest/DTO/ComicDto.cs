@@ -7,6 +7,7 @@ public class ComicDto
     public string Description { get; set; }
     public string Wallpaper { get; set; }
     public string Artist { get; set; }
+    public string Url { get; set; }
     public List<string> Categories { get; set; }
 }
 

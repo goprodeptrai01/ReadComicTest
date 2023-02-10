@@ -30,6 +30,10 @@ public class PageRepository : IPageRepository
                 Url = p.Url,
                 Chapter = p.Chapter.Name,
             }).ToListAsync();
+        if (data == null)
+        {
+            throw new Exception("Couldn't get any data!");
+        }
         return data;
     }
 
@@ -46,7 +50,9 @@ public class PageRepository : IPageRepository
                 Chapter = p.Chapter.Name,
             }).FirstOrDefaultAsync();
         if (data == null)
+        {
             return null;
+        }
         return _mapper.Map<PageDto>(data);
     }
 

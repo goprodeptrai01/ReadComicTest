@@ -1,5 +1,10 @@
+using System.Reflection;
+using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using ReadMangaTest.Data;
 using ReadMangaTest.DataScrapping;
 using ReadMangaTest.Interfaces;
@@ -18,10 +23,13 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull);
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IComicRepository, ComicRepository>();
 builder.Services.AddScoped<IChapterRepository, ChapterRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IArtistRepository, ArtistRepository>();
+builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IUriService>(o =>
 {
@@ -32,13 +40,77 @@ builder.Services.AddSingleton<IUriService>(o =>
 });
 builder.Services.AddControllers()
     .AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = null; });
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration.GetValue<string>("Jwt:Issuer"),
+            ValidAudience = builder.Configuration.GetValue<string>("Jwt:Audience"),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("Jwt:Key")))
+        };
+    });
+builder.Services.AddSwaggerGen(option =>
+{
+    option.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Demo API", 
+        Version = "v1",
+        Description = "An API to perform Employee operations",
+        TermsOfService = new Uri("https://example.com/terms"),
+        Contact = new OpenApiContact
+        {
+            Name = "John Walkner",
+            Email = "John.Walkner@gmail.com",
+            Url = new Uri("https://twitter.com/jwalkner"),
+        },
+        License = new OpenApiLicense
+        {
+            Name = "Employee API LICX",
+            Url = new Uri("https://example.com/license"),
+        }
+    });
+    // Set the comments path for the Swagger JSON and UI.
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    option.IncludeXmlComments(xmlPath);
+    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter a valid token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
+    });
+    option.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+});
+builder.Services.AddMvc();
+builder.Services.AddControllers();
+builder.Services.AddRazorPages();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-#pragma warning disable [warning code]
 var app = builder.Build();
-#pragma warning disable [warning code]
 // if (args.Length == 1 && args[0].ToLower() == "seeddata")
 //     SeedData(app);
 //

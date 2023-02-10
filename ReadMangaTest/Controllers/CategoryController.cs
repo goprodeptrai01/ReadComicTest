@@ -74,6 +74,20 @@ public class CategoryController : ControllerBase
         }
     }
 
+    
+    /// <summary>
+    /// Creates an Category.
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    /// 
+    ///     POST api/Employee
+    ///     {        
+    ///       "Name": "Action",
+    ///       "Description": "Attack scenes"      
+    ///     }
+    /// </remarks>
+    /// <param name="Category"></param>     
     [HttpPost]
     [ProducesResponseType(201, Type = typeof(Category))]
     [ProducesResponseType(400)]

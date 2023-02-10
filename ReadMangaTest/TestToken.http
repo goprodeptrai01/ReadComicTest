@@ -1,0 +1,16 @@
+﻿###login
+POST https://localhost:44325/v1/api/auth/login
+Content-Type: application/json
+
+{
+  "Username": "string",
+  "Password": "string"
+}
+
+###get comic
+GET https://localhost:44325/v1/api/comic
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBcnRpc3QiLCJleHAiOjE2NzU5OTc4NTQsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjQ0MzI1LyIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjQ0MzI1LyJ9.nJzZdzmkxbHjURBXcUqjNyefPDPoSA6KvQkcn8Za6xk
+
+###logout
+POST https://localhost:44325/v1/api/auth/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBcnRpc3QiLCJleHAiOjE2NzYwMDAzNDMsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjQ0MzI1LyIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjQ0MzI1LyJ9.cz0jYgaWc5eyBz5svpBLaELnrF2e2mDby6FhIjz5_PU

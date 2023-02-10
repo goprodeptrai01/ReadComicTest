@@ -86,7 +86,7 @@ public class ArtistController : ControllerBase
         try
         {
             await _artistRepository.AddAsync(_mapper.Map<ArtistDto>(artistDto));
-            return Ok(artistDto);
+            return Created("Artist", artistDto);
         }
         catch (Exception e)
         {
